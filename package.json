@@ -7,7 +7,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "typescript": "^4.9.3"
   },
   "scripts": {
     "day2": "node day2/solve.js",
