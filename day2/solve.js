@@ -1,6 +1,10 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
+console.log("🎄 Day 2")
+
+/// Part 1
+
 const points = {
   A: 1,
   B: 2,
@@ -61,7 +65,7 @@ const pointsPerRound = data.map(([oppHand, outcome]) => {
 const sum = pointsPerRound.reduce((acc, val) => acc + val, 0)
 console.log("Part 2:", sum)
 
-// ---------------------------------------------------------------
+/// Part 2
 
 // const part2 = data;
 // console.log("Part 2", part2);
