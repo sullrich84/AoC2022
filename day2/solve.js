@@ -3,69 +3,79 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 2")
 
-/// Part 1
-
 const points = {
-  A: 1,
-  B: 2,
-  C: 3,
+  rock: 1,
+  paper: 2,
+  scissor: 3,
 
-  LOSE: 0,
-  DRAW: 3,
-  WIN: 6,
+  lose: 0,
+  draw: 3,
+  win: 6,
 }
 
-const pointsPerRound = data.map(([oppHand, outcome]) => {
-  let gamePoints
-  let handPoints
+const rules = {
+  rock: {
+    rock: "draw",
+    paper: "lose",
+    scissor: "win",
+  },
+  paper: {
+    rock: "win",
+    paper: "draw",
+    scissor: "lose",
+  },
+  scissor: {
+    rock: "lose",
+    paper: "win",
+    scissor: "draw",
+  },
+}
 
-  switch (outcome) {
-    case "X": // LOSE
-      gamePoints = points.LOSE
+/// Part 1
 
-      switch (oppHand) {
-        case "A":
-          handPoints = points.C
-          break
-        case "B":
-          handPoints = points.A
-          break
-        case "C":
-          handPoints = points.B
-          break
-      }
-      break
+const map1 = ([oppHand, myHand]) => {
+  const outcome = rules[myHand][oppHand]
+  return points[myHand] + points[outcome]
+}
 
-    case "Y": // DRAW
-      gamePoints = points.DRAW
-      handPoints = points[oppHand]
-      break
+const sRes1 = _.sum(sample.map(map1))
+const res1 = _.sum(data.map(map1))
 
-    case "Z": // WIN
-      gamePoints = points.WIN
-
-      switch (oppHand) {
-        case "A":
-          handPoints = points.B
-          break
-        case "B":
-          handPoints = points.C
-          break
-        case "C":
-          handPoints = points.A
-          break
-      }
-      break
-  }
-
-  console.log("Points:", handPoints, gamePoints)
-  return handPoints + gamePoints
-})
-
-const sum = pointsPerRound.reduce((acc, val) => acc + val, 0)
-console.log("Part 2:", sum)
+console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
-// const part2 = data;
-// console.log("Part 2", part2);
+const strat = {
+  rock: "lose",
+  paper: "draw",
+  scissor: "win",
+}
+
+const rules2 = {
+  win: {
+    rock: "paper",
+    paper: "scissor",
+    scissor: "rock",
+  },
+  lose: {
+    rock: "scissor",
+    paper: "rock",
+    scissor: "paper",
+  },
+  draw: {
+    rock: "rock",
+    paper: "paper",
+    scissor: "scissor",
+  },
+}
+
+const map2 = ([oppHand, myHand]) => {
+  const outcome = strat[myHand]
+  const hand2Play = rules2[outcome][oppHand]
+  return points[outcome] + points[hand2Play]
+}
+
+const sRes2 = _.sum(sample.map(map2))
+const res2 = _.sum(data.map(map2))
+
+console.log("Sample:", sRes2, "Task:", res2)
