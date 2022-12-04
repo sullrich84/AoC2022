@@ -1,4 +1,4 @@
-# Advent of Code 2022 🎄
+# Advent of Code 2022 🎄 ![visitor badge](https://visitor-badge.glitch.me/badge?page_id=sullrich84.visitor-badge)
 
  ![visitor badge](https://visitor-badge.glitch.me/badge?page_id=sullrich84.visitor-badge)
 
