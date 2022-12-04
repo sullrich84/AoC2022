@@ -33,13 +33,13 @@ const rules = {
 
 /// Part 1
 
-const map1 = ([oppHand, myHand]) => {
+const solve1 = ([oppHand, myHand]) => {
   const outcome = rules[myHand][oppHand]
   return points[myHand] + points[outcome]
 }
 
-const sRes1 = _.sum(sample.map(map1))
-const res1 = _.sum(data.map(map1))
+const sRes1 = _.sum(sample.map(solve1))
+const res1 = _.sum(data.map(solve1))
 
 console.log("Sample:", sRes1, "Task:", res1)
 
@@ -69,13 +69,13 @@ const rules2 = {
   },
 }
 
-const map2 = ([oppHand, myHand]) => {
+const solve2 = ([oppHand, myHand]) => {
   const outcome = strat[myHand]
   const hand2Play = rules2[outcome][oppHand]
   return points[outcome] + points[hand2Play]
 }
 
-const sRes2 = _.sum(sample.map(map2))
-const res2 = _.sum(data.map(map2))
+const sRes2 = _.sum(sample.map(solve2))
+const res2 = _.sum(data.map(solve2))
 
 console.log("Sample:", sRes2, "Task:", res2)
