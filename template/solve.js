@@ -5,7 +5,8 @@ console.log("🎄 Day X")
 
 /// Part 1
 
-const solve1 = (_) => {
+const solve1 = (input) => {
+  console.log(input)
   return 0
 }
 
@@ -16,7 +17,8 @@ console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
-const solve2 = (_) => {
+const solve2 = (input) => {
+  console.log(input)
   return 0
 }
 
