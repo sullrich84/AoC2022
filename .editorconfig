@@ -10,15 +10,8 @@ indent_style = space
 indent_size = 2
 max_line_length=160
 
-[*.{js,jsx}]
+[*.js]
 quote_type = double
-
-[*.{ts,tsx}]
-quote_type = double
-
-[*.{yml,yaml}]
-indent_style = space
-indent_size = 2
 
 [*.md]
 max_line_length = off
