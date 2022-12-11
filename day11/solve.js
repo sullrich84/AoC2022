@@ -19,8 +19,6 @@ const solve1 = (input) => {
     }
   })
 
-  const gcd = monkeys.map((m) => m.divisible).reduce((acc, val) => acc * val, 1)
-
   _.times(20, () => {
     monkeys.forEach((monkey, index) => {
       const tempItems = [...monkey.items]
@@ -29,7 +27,7 @@ const solve1 = (input) => {
         var worryLevel = eval(`var oldVal = ${item}; var newVal; ${monkey.operation}`)
         worryLevel = Math.floor(worryLevel / 3)
         const target = worryLevel % monkey.divisible === 0 ? monkey.conditions[0] : monkey.conditions[1]
-        monkeys[target].items = [...monkeys[target].items, worryLevel % gcd]
+        monkeys[target].items = [...monkeys[target].items, worryLevel]
         monkeys[index].items.shift()
         monkeys[index].inspects += 1
       })
