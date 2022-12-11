@@ -27,14 +27,10 @@ const solve1 = (ctx) => {
     }
   })
 
-  return _.sum([
-    _.find(ctx.states, (state) => state.cycle === 20).strength,
-    _.find(ctx.states, (state) => state.cycle === 60).strength,
-    _.find(ctx.states, (state) => state.cycle === 100).strength,
-    _.find(ctx.states, (state) => state.cycle === 140).strength,
-    _.find(ctx.states, (state) => state.cycle === 180).strength,
-    _.find(ctx.states, (state) => state.cycle === 220).strength,
-  ])
+  return ctx.states
+    .filter(({ cycle }) => [20, 60, 100, 140, 180, 220].includes(cycle))
+    .map(({ strength }) => strength)
+    .reduce((a, v) => a + v)
 }
 
 const sRes1 = [{ data: sample, cycle: 0, X: 1, states: [] }].map(solve1)
