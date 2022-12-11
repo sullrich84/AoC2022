@@ -1,5 +1,5 @@
 import _ from "lodash"
-import data, { sample, sampleR } from "./data.js"
+import data, { sample } from "./data.js"
 
 console.log("🎄 Day 8")
 
