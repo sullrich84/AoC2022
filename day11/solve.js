@@ -1,12 +1,7 @@
 import _ from "lodash"
-import BigNumber from "bignumber.js"
 import data, { sample } from "./data.js"
 
-function isFloat(n) {
-  return n === +n && n !== (n | 0)
-}
-
-console.log("🎄 Day X")
+console.log("🎄 Day 11")
 
 /// Part 1
 
@@ -31,12 +26,11 @@ const solve1 = (input) => {
       const tempItems = [...monkey.items]
 
       tempItems.forEach((item) => {
-        const worryLevel = eval(`var oldVal = ${item}; var newVal; ${monkey.operation}`)
-        const worryLevelDivided = Math.floor(worryLevel / 3)
-        const target = !isFloat(worryLevelDivided / monkey.divisible) ? monkey.conditions[0] : monkey.conditions[1]
-        monkeys[target].items = [...monkeys[target].items, worryLevelDivided % gcd]
+        var worryLevel = eval(`var oldVal = ${item}; var newVal; ${monkey.operation}`)
+        worryLevel = Math.floor(worryLevel / 3)
+        const target = worryLevel % monkey.divisible === 0 ? monkey.conditions[0] : monkey.conditions[1]
+        monkeys[target].items = [...monkeys[target].items, worryLevel % gcd]
         monkeys[index].items.shift()
-        // console.log(`item with worry level ${worryLevelDivided} is thrown to monkey ${target}`)
         monkeys[index].inspects += 1
       })
     })
