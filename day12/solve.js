@@ -99,15 +99,8 @@ const solve1 = (ctx) => {
     return findWay(dest.y, dest.x, attempt + 1, maxAttempts)
   }
 
-  const runs = []
-
-  for (var i = 0; i < 50; i++) {
-    const r = findWay(startY, startX, 0, 1000)
-    runs.push(r)
-  }
-
-  console.log(runs)
-  return _.min(runs)
+  const runs = findWay(startY, startX, 0, 2000)
+  return runs
 }
 
 const sRes1 = [{ data: sample }].map(solve1)
