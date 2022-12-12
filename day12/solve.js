@@ -47,10 +47,10 @@ const solve1 = (ctx) => {
   // Set neighbours
   map.forEach((row, y) => {
     row.forEach((__, x) => {
-      const top = _.inRange(y - 1, 0, map.length) ? { y: y - 1, x } : null
-      const down = _.inRange(y + 1, 0, map.length) ? { y: y + 1, x } : null
-      const left = _.inRange(x - 1, 0, row.length) ? { y, x: x - 1 } : null
-      const right = _.inRange(x + 1, 0, row.length) ? { y, x: x + 1 } : null
+      const top = _.inRange(y - 1, 0, map.length) ? map[y - 1][x] : null
+      const down = _.inRange(y + 1, 0, map.length) ? map[y + 1][x] : null
+      const left = _.inRange(x - 1, 0, row.length) ? map[y][x - 1] : null
+      const right = _.inRange(x + 1, 0, row.length) ? map[y][x + 1] : null
 
       map[y][x] = {
         ...map[y][x],
@@ -62,18 +62,13 @@ const solve1 = (ctx) => {
     })
   })
 
-  const findWay = (y, x, attempt, maxAttempts) => {
+  const findWay = (y, x, attempt) => {
     visit[y][x] += 1
-    if (attempt >= maxAttempts || (x == endX && y == endY)) return attempt
+    if (attempt >= 5000 || (x == endX && y == endY)) return attempt
 
     const nextDest = (currentY, currentX) => {
       const position = map[currentY][currentX]
       var dest = [position.top, position.down, position.left, position.right].filter((p) => p != null)
-
-      dest.map((p) => {
-        p.height = map[p.y][p.x].height
-        return p
-      })
 
       dest.map((p) => {
         p.visit = visit[p.y][p.x]
@@ -96,10 +91,10 @@ const solve1 = (ctx) => {
     }
 
     const dest = nextDest(y, x)
-    return findWay(dest.y, dest.x, attempt + 1, maxAttempts)
+    return findWay(dest.y, dest.x, attempt + 1)
   }
 
-  const runs = findWay(startY, startX, 0, 2000)
+  const runs = findWay(startY, startX, 0)
   return runs
 }
 
