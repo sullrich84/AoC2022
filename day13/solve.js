@@ -8,44 +8,65 @@ console.log("🎄 Day 13")
 const compare = (left, right) => {
   console.log(`Compare ${JSON.stringify(left)} vs. ${JSON.stringify(right)}`)
 
-  if (!_.isUndefined(left) && _.isUndefined(right)) {
-    console.warn("Right side ran out of items")
-    return false
+  if (_.isInteger(left) && _.isInteger(right)) {
+    // If both values are integers, the lower integer should come first. If the left integer is lower
+    // than the right integer, the inputs are in the right order. If the left integer is higher than
+    // the right integer, the inputs are not in the right order. Otherwise, the inputs are the same
+    // integer; continue checking the next part of the input.
+
+    if (left < right) {
+      // If the left integer is lower than the right integer, the inputs are in the right order.
+      return true
+    }
+
+    if (left > right) {
+      // If the left integer is higher than the right integer, the inputs are not in the right order
+      return false
+    }
+
+    if (left == right) {
+      //Inputs are the same integer; continue checking the next part of the input.
+      return null
+    }
   }
 
-  if (_.isUndefined(left) && !_.isUndefined(right)) {
-    console.warn("Left side ran out of items")
-    return true
-  }
+  // if (!_.isUndefined(left) && _.isUndefined(right)) {
+  //   // Right side ran out of items, so inputs are not in the right order
+  //   return false
+  // }
 
-  if (_.isUndefined(left) && _.isUndefined(right)) {
-    // console.log("Both values empty")
-    return true
-  }
-
-  if (_.isInteger(left) && _.isInteger(right) && left <= right) {
-    // console.log(`left ${left} <= ${right} right`)
-    return true
-  }
+  // if (_.isUndefined(left) && !_.isUndefined(right)) {
+  //   // Left side ran out of items, so inputs are in the right order
+  //   return true
+  // }
 
   if (_.isArray(left) && _.isArray(right)) {
-    // Both are lists
+    // If both values are lists, compare the first value of each list, then the second value, and so on.
+    // If the left list runs out of items first, the inputs are in the right order. If the right list
+    // runs out of items first, the inputs are not in the right order. If the lists are the same length
+    // and no comparison makes a decision about the order, continue checking the next part of the input.
     return compareLists(left, right)
   }
 
-  if (_.isInteger(left) && _.isArray(right)) {
-    // If the left list runs out of items first, the inputs are in the right order.
-    if (left == _.first(right)) return true
-    return left < _.first(right)
+  if ((_.isInteger(left) && _.isArray(right)) || (_.isArray(left) && _.isInteger(right))) {
+    // If exactly one value is an integer, convert the integer to a list which contains that integer as its
+    // only value, then retry the comparison. For example, if comparing [0,0,0] and 2, convert the right
+    // value to [2] (a list containing 2); the result is then found by instead comparing [0,0,0] and [2].
+
+    if (_.isInteger(left) && _.isArray(right)) {
+      // If the left list runs out of items first, the inputs are in the right order.
+      return left < _.first(right)
+    }
+
+    if (_.isArray(left) && _.isInteger(right)) {
+      // If the right list runs out of items first, the inputs are not in the right order.
+      // [1,1,1,1] vs [1]
+
+      return _.first(left) < right
+    }
   }
 
-  if (_.isArray(left) && _.isInteger(right)) {
-    // If the right list runs out of items first, the inputs are not in the right order.
-    return _.first(left) < right
-  }
-
-  console.warn(`Missmatch detected => ${JSON.stringify(left)} vs. ${JSON.stringify(right)}`)
-  return false
+  throw "Unhandled case"
 }
 
 const compareLists = (left, right) => {
