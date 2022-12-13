@@ -34,15 +34,14 @@ const compare = (left, right) => {
   }
 
   if (_.isInteger(left) && _.isArray(right)) {
-    // Left is Integer while right is array
-    // console.log(`Mixed content; converting left ${JSON.stringify(left)}`)
-    return compareLists([left], right)
+    // If the left list runs out of items first, the inputs are in the right order.
+    if (left == _.first(right)) return true
+    return left < _.first(right)
   }
 
   if (_.isArray(left) && _.isInteger(right)) {
-    // Left is Array while right is Integer
-    // console.log(`Mixed content; converting right ${JSON.stringify(right)}`)
-    return compareLists(_.take(left, 1), [right])
+    // If the right list runs out of items first, the inputs are not in the right order.
+    return _.first(left) < right
   }
 
   console.warn(`Missmatch detected => ${JSON.stringify(left)} vs. ${JSON.stringify(right)}`)
@@ -67,7 +66,7 @@ const solve1 = ([left, right], pairNumber) => {
 }
 
 const sRes1 = _.sum(sample.map(solve1).map((res, idx) => (res ? idx + 1 : 0)))
-const res1 = 0 //_.sum(data.map(solve1).map((res, idx) => (res ? idx + 1 : 0)))
+const res1 = _.sum(data.map(solve1).map((res, idx) => (res ? idx + 1 : 0))) // > 620
 
 console.log("Sample:", sRes1, "Task:", res1)
 
