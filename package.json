@@ -12,6 +12,7 @@
     "typescript": "^4.9.3"
   },
   "scripts": {
+    "day13": "node day13/solve.js",
     "day12": "node day12/solve.js",
     "day11": "node day11/solve.js",
     "day10": "node day10/solve.js",
