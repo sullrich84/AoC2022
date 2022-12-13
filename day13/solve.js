@@ -7,7 +7,7 @@ console.log("🎄 Day 13")
 
 function compare(left, right) {
   if (_.isNumber(left) && _.isNumber(right)) {
-    return left === right ? null : left < right ? true : false
+    return left === right ? null : left < right
   }
 
   if (_.isNumber(left)) {
