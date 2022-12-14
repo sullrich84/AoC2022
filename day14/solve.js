@@ -20,17 +20,16 @@ function pairwise(arr, func) {
 
 const solve1 = (ctx) => {
   const flattenData = [..._.flatten(ctx.data), [500, 0]]
-  const minX = _.min(flattenData.map(([x, y]) => x)) - 2 // allows sand flow aside
-  const maxX = _.max(flattenData.map(([x, y]) => x)) + 2 // allows sand flow aside
-  const minY = _.min(flattenData.map(([x, y]) => y))
-  const maxY = _.max(flattenData.map(([x, y]) => y))
+  const minX = _.min(flattenData.map(([x]) => x)) - 2 // allow sand to flow aside
+  const maxX = _.max(flattenData.map(([x]) => x)) + 2 // allow sand to flow aside
+  const minY = _.min(flattenData.map(([_x, y]) => y))
+  const maxY = _.max(flattenData.map(([_x, y]) => y))
 
   const map = _.times(maxY - minY + 1, () => new Array(maxX - minX + 1).fill("."))
 
   const setRock = (x, y) => {
     const dx = x - minX
     const dy = y - minY
-    // if (!map[dy]) map[dy] = []
     map[dy][dx] = "#"
   }
 
@@ -69,15 +68,13 @@ const solve1 = (ctx) => {
     let y = 0 // down
 
     while (true) {
-      const nextPos = get(x, y + 1)
-      if (nextPos !== ".") {
+      if (get(x, y + 1) !== ".") {
         // Block below is blocked
-        const nextPosLeft = get(x - 1, y + 1)
-        const nextPosRight = get(x + 1, y + 1)
-
-        if (nextPosLeft === ".") {
+        if (get(x - 1, y + 1) === ".") {
+          // Go left
           x -= 1
-        } else if (nextPosRight === ".") {
+        } else if (get(x + 1, y + 1) === ".") {
+          // Go right
           x += 1
         } else {
           // Both ways arround blocked; place at current
@@ -109,10 +106,10 @@ console.log("Sample:", sRes1, "Task:", res1)
 
 const solve2 = (ctx) => {
   const flattenData = [..._.flatten(ctx.data), [500, 0]]
-  const minX = _.min(flattenData.map(([x, y]) => x)) - 1000 // guessed :)
-  const maxX = _.max(flattenData.map(([x, y]) => x)) + 1000 // guessed :)
-  const minY = _.min(flattenData.map(([x, y]) => y))
-  const maxY = _.max(flattenData.map(([x, y]) => y)) + 2
+  const minY = _.min(flattenData.map(([_x, y]) => y))
+  const maxY = _.max(flattenData.map(([_x, y]) => y)) + 2
+  const minX = _.min(flattenData.map(([x]) => x)) - maxY
+  const maxX = _.max(flattenData.map(([x]) => x)) + maxY
 
   const map = _.times(maxY - minY + 1, () => new Array(maxX - minX + 1).fill("."))
 
@@ -122,13 +119,12 @@ const solve2 = (ctx) => {
     map[dy][dx] = "#"
   }
 
-  ;[
-    ...ctx.data,
-    [
-      [minX, maxY],
-      [maxX, maxY],
-    ],
-  ].forEach((input) => {
+  const floor = [
+    [minX, maxY],
+    [maxX, maxY],
+  ]
+
+  ;[...ctx.data, floor].forEach((input) => {
     pairwise(input, ([x1, y1], [x2, y2]) => {
       const xS = _.min([x1, x2])
       const xE = _.max([x1, x2])
@@ -163,19 +159,15 @@ const solve2 = (ctx) => {
     let y = 0 // down
 
     while (true) {
-      const nextPos = get(x, y + 1)
-      if (nextPos !== ".") {
+      if (get(x, y + 1) !== ".") {
         // Block below is blocked
-        const nextPosLeft = get(x - 1, y + 1)
-        const nextPosRight = get(x + 1, y + 1)
-
-        if (nextPosLeft === ".") {
+        if (get(x - 1, y + 1) === ".") {
+          // Go left
           x -= 1
-        } else if (nextPosRight === ".") {
+        } else if (get(x + 1, y + 1) === ".") {
+          // Go right
           x += 1
         } else {
-          // Both ways arround blocked; place at current
-
           rest += 1
 
           // Flow began at start
@@ -184,6 +176,7 @@ const solve2 = (ctx) => {
             break
           }
 
+          // Both ways arround blocked; place at current
           set(x, y, "o")
           break
         }
