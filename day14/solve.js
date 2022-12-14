@@ -96,21 +96,21 @@ const solve1 = (ctx) => {
     }
   }
 
-  drawMap(map)
+  // drawMap(map)
   return rest
 }
 
-// const sRes1 = [{ data: sample }].map(solve1)
-// const res1 = [{ data: data }].map(solve1)
+const sRes1 = [{ data: sample }].map(solve1)
+const res1 = [{ data: data }].map(solve1)
 
-// console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
 const solve2 = (ctx) => {
   const flattenData = [..._.flatten(ctx.data), [500, 0]]
-  const minX = _.min(flattenData.map(([x, y]) => x)) - 3000 // guessed :)
-  const maxX = _.max(flattenData.map(([x, y]) => x)) + 3000 // guessed :)
+  const minX = _.min(flattenData.map(([x, y]) => x)) - 1000 // guessed :)
+  const maxX = _.max(flattenData.map(([x, y]) => x)) + 1000 // guessed :)
   const minY = _.min(flattenData.map(([x, y]) => y))
   const maxY = _.max(flattenData.map(([x, y]) => y)) + 2
 
@@ -198,7 +198,7 @@ const solve2 = (ctx) => {
     }
   }
 
-  drawMap(map)
+  // drawMap(map)
   return rest
 }
 
