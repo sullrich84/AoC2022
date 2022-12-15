@@ -56,9 +56,7 @@ const solve2 = (ctx) => {
 
     for (var v = sy - distance; v <= sy + distance; v++) {
       if (v >= 0 && v <= ctx.target) {
-        const xMin = sx - c
-        const xMax = sx + c
-
+        const [xMin, xMax] = [sx - c, sx + c]
         if (!search[v]) search[v] = []
         search[v].push([xMin, xMax])
       }
@@ -71,27 +69,27 @@ const solve2 = (ctx) => {
   for (var i = 0; i < search.length; i++) {
     var blocks = search[i]
 
-    // ii is the smart search counter
-    for (var ii = 0; ii < ctx.target; ii++) {
+    for (var leapingIndex = 0; leapingIndex < ctx.target; leapingIndex++) {
+      // Bring the blocks in order to enable index leaping
       blocks = _.orderBy(blocks, ([x1]) => x1)
 
-      for (var iii = 0; iii < blocks.length; iii++) {
-        var [x1, x2] = blocks[iii]
-        if (x1 <= ii && x2 >= ii) {
-          // ii falls in blocks range; set ii to highest yet detected end
-          ii = _.max([x2, ii])
-        } else if (x1 > ii) {
-          // start of block is greater than ii; we found a gap
-          return (ii + 1) * 4000000 + i
+      for (var blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+        var [x1, x2] = blocks[blockIndex]
+
+        if (x1 <= leapingIndex && x2 >= leapingIndex) {
+          // leaping index falls in block range
+          leapingIndex = _.max([x2, leapingIndex])
+        } else if (x1 > leapingIndex) {
+          // leaping index found a gap
+          const [gapX, gapY] = [leapingIndex + 1, i]
+          return gapX * 4000000 + gapY
         }
       }
     }
   }
-
-  throw "f*** my life"
 }
 
-const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
+const sRes2 = [{ data: sample, target: 20 }].map(solve2)
 const res2 = [{ data: data, target: 4000000 }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
