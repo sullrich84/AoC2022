@@ -3,43 +3,9 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 15")
 
-function drawMap(map) {
-  console.clear()
-  map.forEach((row) => {
-    console.log(row.join(""))
-  })
-}
-
 /// Part 1
 
 const solve1 = (ctx) => {
-  // const minX = _.min(_.flatten(ctx.data.map(([sx, sy, bx, by]) => [sx, bx])))
-  // const maxX = _.max(_.flatten(ctx.data.map(([sx, sy, bx, by]) => [sx, bx])))
-  // const minY = _.min(_.flatten(ctx.data.map(([sx, sy, bx, by]) => [sy, by])))
-  // const maxY = _.max(_.flatten(ctx.data.map(([sx, sy, bx, by]) => [sy, by])))
-
-  // var map = []
-
-  // _.range(minY, maxY + 1).forEach((mx) => {
-  //   map[mx] = []
-  //   _.range(minX, maxX + 1).forEach((my) => {
-  //     map[mx][my] = "."
-  //   })
-  // })
-
-  // const get = (x, y) => {
-  //   return map[y][x]
-  // }
-
-  // const set = (x, y, v) => {
-  //   map[y][x] = v
-  // }
-
-  // ctx.data.forEach(([sx, sy, bx, by]) => {
-  //   set(sx, sy, "S") // Set sensor
-  //   set(bx, by, "B") // Set beacon
-  // })
-
   const search = []
 
   ctx.data.forEach(([sx, sy, bx, by]) => {
@@ -62,6 +28,7 @@ const solve1 = (ctx) => {
           _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
           _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
         }
+
         // Smooth brain coudn't optimize this at 6am
         c = v < sy ? c + 1 : c - 1
       }
@@ -73,19 +40,46 @@ const solve1 = (ctx) => {
   return min > max ? min - max : max - min
 }
 
-const sRes1 = [{ data: sample, target: 10 }].map(solve1)
-const res1 = [{ data: data, target: 2000000 }].map(solve1)
+// const sRes1 = [{ data: sample, target: 10 }].map(solve1)
+// const res1 = [{ data: data, target: 2000000 }].map(solve1)
 
-console.log("Sample:", sRes1, "Task:", res1)
+// console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
-// const solve2 = (input) => {
-//   console.log(input)
-//   return 0
-// }
+const solve2 = (ctx) => {
+  const sensors = ctx.data.map(([sx, sy, bx, by]) => {
+    return {
+      sensor: { x: sx, y: sy },
+      // beacon: {x: bx, y: by},
+      distance: Math.abs(bx - sx) + Math.abs(by - sy),
+    }
+  })
 
-// const sRes2 = 0 //_.sum(sample.map(solve2))
-// const res2 = 0 //_.sum(data.map(solve2))
+  const isCellCovered = (x, y) => {
+    for (var i = 0; i < sensors.length; i++) {
+      const s = sensors[i]
+      const distFromCellToSensor = Math.abs(x - s.sensor.x) + Math.abs(y - s.sensor.y)
+      if (s.distance >= distFromCellToSensor) {
+        return true
+      }
+    }
 
-// console.log("Sample:", sRes2, "Task:", res2)
+    return false
+  }
+
+  for (var y = 0; y <= ctx.target; y++) {
+    console.log("Checking row", y)
+    for (var x = 0; x <= ctx.target; x++) {
+      // Check if cell is covered by signal
+      if (!isCellCovered(x, y)) {
+        return x * 4000000 + y
+      }
+    }
+  }
+}
+
+const sRes2 = [{ data: sample, target: 20 }].map(solve2)
+const res2 = [{ data: data, target: 4000000 }].map(solve2)
+
+console.log("Sample:", sRes2, "Task:", res2)
