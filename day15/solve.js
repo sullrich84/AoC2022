@@ -70,12 +70,13 @@ const solve2 = (ctx) => {
 
   for (var i = 0; i < search.length; i++) {
     var blocks = search[i]
-    var r = _.range(ctx.target)
+    var r = _.range(0, ctx.target)
 
     blocks.forEach(([x1, x2]) => {
-      _.remove(r, (e) => {
-        return e >= x1 && e <= x2
-      })
+      var xs = x1 <= 0 ? 0 : x1
+      var xe = x2 + 1 >= ctx.target ? ctx.target : x2 + 1
+      var rr = _.range(xs, xe)
+      r = _.difference(r, rr)
     })
 
     if (r[0]) {
@@ -87,6 +88,6 @@ const solve2 = (ctx) => {
 }
 
 const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
-const res2 = [{ data: data, target: 4000000 }].map(solve2)
+const res2 = 0 [{ data: data, target: 4000000 }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
