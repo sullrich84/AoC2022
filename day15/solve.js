@@ -62,6 +62,7 @@ const solve1 = (ctx) => {
           _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
           _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
         }
+        // Smooth brain coudn't optimize this at 6am
         c = v < sy ? c + 1 : c - 1
       }
     }
@@ -72,7 +73,7 @@ const solve1 = (ctx) => {
   return min > max ? min - max : max - min
 }
 
-const sRes1 = 0// [{ data: sample, target: 10 }].map(solve1)
+const sRes1 = [{ data: sample, target: 10 }].map(solve1)
 const res1 = [{ data: data, target: 2000000 }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
