@@ -40,10 +40,10 @@ const solve1 = (ctx) => {
   return min > max ? min - max : max - min
 }
 
-// const sRes1 = [{ data: sample, target: 10 }].map(solve1)
-// const res1 = [{ data: data, target: 2000000 }].map(solve1)
+const sRes1 = [{ data: sample, target: 10 }].map(solve1)
+const res1 = [{ data: data, target: 2000000 }].map(solve1)
 
-// console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
