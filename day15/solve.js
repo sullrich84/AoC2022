@@ -70,21 +70,25 @@ const solve2 = (ctx) => {
 
   for (var i = 0; i < search.length; i++) {
     var blocks = search[i]
-    var r = _.range(0, ctx.target)
 
-    blocks.forEach(([x1, x2]) => {
-      var xs = x1 <= 0 ? 0 : x1
-      var xe = x2 + 1 >= ctx.target ? ctx.target : x2 + 1
-      var rr = _.range(xs, xe)
-      r = _.difference(r, rr)
-    })
+    // ii is the smart search counter
+    for (var ii = 0; ii < ctx.target; ii++) {
+      blocks = _.orderBy(blocks, ([x1]) => x1)
 
-    if (r[0]) {
-      return r[0] * 4000000 + i
+      for (var iii = 0; iii < blocks.length; iii++) {
+        var [x1, x2] = blocks[iii]
+        if (x1 <= ii && x2 >= ii) {
+          // ii falls in blocks range; set ii to highest yet detected end
+          ii = _.max([x2, ii])
+        } else if (x1 > ii) {
+          // start of block is greater than ii; we found a gap
+          return (ii + 1) * 4000000 + i
+        }
+      }
     }
   }
 
-  return "search.length"
+  throw "f*** my life"
 }
 
 const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
