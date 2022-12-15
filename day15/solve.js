@@ -55,28 +55,38 @@ const solve2 = (ctx) => {
     var c = 0
 
     for (var v = sy - distance; v <= sy + distance; v++) {
-      // if (v >= 0 && v <= ctx.target) {
-      const xMin = sx - c
-      const xMax = sx + c
+      if (v >= 0 && v <= ctx.target) {
+        const xMin = sx - c
+        const xMax = sx + c
 
-      // if (xMin >= 0 && xMax <= ctx.target) {
-      const oldMin = _.get(search, `[${v}].min`, xMin)
-      const oldMax = _.get(search, `[${v}].max`, xMax)
-
-      _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
-      _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
-      // }
-      // }
+        if (!search[v]) search[v] = []
+        search[v].push([xMin, xMax])
+      }
 
       // Smooth brain coudn't optimize this at 6am
       c = v < sy ? c + 1 : c - 1
     }
   })
 
-  return search.length
+  for (var i = 0; i < search.length; i++) {
+    var blocks = search[i]
+    var r = _.range(ctx.target)
+
+    blocks.forEach(([x1, x2]) => {
+      _.remove(r, (e) => {
+        return e >= x1 && e <= x2
+      })
+    })
+
+    if (r[0]) {
+      return r[0] * 4000000 + i
+    }
+  }
+
+  return "search.length"
 }
 
-const sRes2 = [{ data: sample, target: 20 }].map(solve2)
-const res2 = 0 // [{ data: data, target: 4000000 }].map(solve2)
+const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
+const res2 = [{ data: data, target: 4000000 }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
