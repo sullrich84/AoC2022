@@ -9,24 +9,17 @@ const solve1 = (ctx) => {
   const search = []
 
   ctx.data.forEach(([sx, sy, bx, by]) => {
-    var distance = Math.abs(bx - sx) + Math.abs(by - sy)
     var c = 0
+    var distance = Math.abs(bx - sx) + Math.abs(by - sy)
+    const [vMin, vMax] = [sy - distance, sy + distance]
 
-    const vMin = sy - distance // -2
-    const vMax = sy + distance // 16
-    const inTargetRange = vMin <= ctx.target && vMax >= ctx.target
-
-    if (inTargetRange) {
+    if (vMin <= ctx.target && vMax >= ctx.target) {
       for (var v = sy - distance; v <= sy + distance; v++) {
         if (v === ctx.target) {
-          const xMin = sx - c
-          const xMax = sx + c
-
-          const oldMin = _.get(search, `[${v}].min`, xMin)
-          const oldMax = _.get(search, `[${v}].max`, xMax)
-
-          _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
-          _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
+          const [xMin, xMax] = [sx - c, sx + c]
+          if (!search[v]) search[v] = []
+          search[v].min = _.min([xMin, search[v].min])
+          search[v].max = _.max([xMax, search[v].max])
         }
 
         // Smooth brain coudn't optimize this at 6am
@@ -51,8 +44,8 @@ const solve2 = (ctx) => {
   const search = []
 
   ctx.data.forEach(([sx, sy, bx, by]) => {
-    var distance = Math.abs(bx - sx) + Math.abs(by - sy)
     var c = 0
+    var distance = Math.abs(bx - sx) + Math.abs(by - sy)
 
     for (var v = sy - distance; v <= sy + distance; v++) {
       if (v >= 0 && v <= ctx.target) {
