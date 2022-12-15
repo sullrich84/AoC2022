@@ -88,6 +88,6 @@ const solve2 = (ctx) => {
 }
 
 const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
-const res2 = 0 [{ data: data, target: 4000000 }].map(solve2)
+const res2 = [{ data: data, target: 4000000 }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
