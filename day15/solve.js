@@ -54,33 +54,29 @@ const solve2 = (ctx) => {
     var distance = Math.abs(bx - sx) + Math.abs(by - sy)
     var c = 0
 
-    const vMin = sy - distance // -2
-    const vMax = sy + distance // 16
-    const inTargetRange = vMin >= 0 && vMax <= ctx.target
+    for (var v = sy - distance; v <= sy + distance; v++) {
+      // if (v >= 0 && v <= ctx.target) {
+      const xMin = sx - c
+      const xMax = sx + c
 
-    if (inTargetRange) {
-      for (var v = sy - distance; v <= sy + distance; v++) {
-        if (v >= 0 && v <= ctx.target) {
-          const xMin = sx - c
-          const xMax = sx + c
+      // if (xMin >= 0 && xMax <= ctx.target) {
+      const oldMin = _.get(search, `[${v}].min`, xMin)
+      const oldMax = _.get(search, `[${v}].max`, xMax)
 
-          const oldMin = _.get(search, `[${v}].min`, xMin)
-          const oldMax = _.get(search, `[${v}].max`, xMax)
+      _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
+      _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
+      // }
+      // }
 
-          _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
-          _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
-        }
-
-        // Smooth brain coudn't optimize this at 6am
-        c = v < sy ? c + 1 : c - 1
-      }
+      // Smooth brain coudn't optimize this at 6am
+      c = v < sy ? c + 1 : c - 1
     }
   })
 
-  return search
+  return search.length
 }
 
-const sRes2 = 0 // [{ data: sample, target: 20 }].map(solve2)
-const res2 = [{ data: data, target: 4000000 }].map(solve2)
+const sRes2 = [{ data: sample, target: 20 }].map(solve2)
+const res2 = 0 // [{ data: data, target: 4000000 }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
