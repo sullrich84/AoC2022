@@ -44,19 +44,30 @@ const solve1 = (ctx) => {
 
   ctx.data.forEach(([sx, sy, bx, by]) => {
     var distance = Math.abs(bx - sx) + Math.abs(by - sy)
-    var c = 0
 
-    for (var v = sy - distance; v <= sy + distance; v++) {
-      const xMin = sx - c
-      const xMax = sx + c
+    var c = sy < ctx.target ? ctx.target - sy : 
+    const xMin = sx - c
+    const xMax = sx + c
 
-      const oldMin = _.get(search, `[${v}].min`, xMin)
-      const oldMax = _.get(search, `[${v}].max`, xMax)
+    const oldMin = _.get(search, `[${v}].min`, xMin)
+    const oldMax = _.get(search, `[${v}].max`, xMax)
 
-      _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
-      _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
-      c = v < sy ? c + 1 : c - 1
-    }
+    _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
+    _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
+
+    // var c = 0
+
+    // for (var v = sy - distance; v <= sy + distance; v++) {
+    //   const xMin = sx - c
+    //   const xMax = sx + c
+
+    //   const oldMin = _.get(search, `[${v}].min`, xMin)
+    //   const oldMax = _.get(search, `[${v}].max`, xMax)
+
+    //   _.set(search, `[${v}].min`, _.min([oldMin, xMin]))
+    //   _.set(search, `[${v}].max`, _.max([oldMax, xMax]))
+    //   c = v < sy ? c + 1 : c - 1
+    // }
   })
 
   const min = search[ctx.target].min
