@@ -54,7 +54,7 @@ const solve2 = (ctx) => {
         search[v].push([xMin, xMax])
       }
 
-      // Smooth brain coudn't optimize this at 6am
+      // Smooth brain couldn't optimize this at 6am
       c = v < sy ? c + 1 : c - 1
     }
   })
