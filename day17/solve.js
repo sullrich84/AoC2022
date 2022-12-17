@@ -199,7 +199,7 @@ const solve2 = ({ data }) => {
 
     // hacky add height of shape
     const shapeHeight = height(shape)
-    addRows(shapeHeight) // Optimize this later
+    addRows(shapeHeight) // This could need some optimization
 
     const syOff = chamber.length - rockHeight - 3
     // left edge is two units away from the left wall
@@ -247,6 +247,7 @@ const solve2 = ({ data }) => {
           const diffFallenRocks = BigInt(fallenRocks) - BigInt(cFallenRocks)
           const diffRockHeight = BigInt(rockHeight) - BigInt(cRockHeight)
 
+          // Calculate the leap that can be made towards target
           const remainingRocks = BigInt(target) - BigInt(fallenRocks)
           const repeat = BigInt(remainingRocks) / BigInt(diffFallenRocks)
 
