@@ -10,8 +10,8 @@ const solve1 = (input) => {
   return 0
 }
 
-const sRes1 = 0 //_.sum(sample.map(solve1))
-const res1 = 0 //_.sum(data.map(solve1))
+const sRes1 = [{ data: sample }].map(solve1)
+const res1 = 0 //[{ data: data }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
 
