@@ -35,47 +35,58 @@ const solve2 = ({ data }) => {
   const zMin = _.min(data.map(([x, y, z]) => z))
   const zMax = _.max(data.map(([x, y, z]) => z))
 
-  const blockCache = {}
-  const hasBlockAt = (x, y, z) => {
-    const key = [x, y, z].join(":")
-    if (key in blockCache) return blockCache[key]
-    const hasBlock = !!data.find(([ex, ey, ez]) => x === ex && y === ey && z === ez)
-    blockCache[key] = hasBlock
-    return hasBlock
-  }
+  const hasBlockAt = (x, y, z) => (data.find(([ex, ey, ez]) => x === ex && y === ey && z === ez) ? true : false)
 
   const exposedCache = {}
   const isExposed = (x, y, z) => {
     const key = [x, y, z].join(":")
     if (key in exposedCache) return exposedCache[key]
 
-    if (x <= xMin || x >= xMax || y <= yMin || y >= xMax || z <= zMin || z >= zMax) {
-      // Block is at the grids outside and therefore exposed
-      exposedCache[key] = true
-      return true
+    if (hasBlockAt(x, y, z)) {
+      exposedCache[key] = false
+      return false
     }
 
-    const exposed =
-      (!hasBlockAt(x - 1, y, z) && isExposed(x - 1, y, z)) ||
-      (!hasBlockAt(x + 1, y, z) && isExposed(x + 1, y, z)) ||
-      (!hasBlockAt(x, y + 1, z) && isExposed(x, y + 1, z)) ||
-      (!hasBlockAt(x, y - 1, z) && isExposed(x, y - 1, z)) ||
-      (!hasBlockAt(x, y, z + 1) && isExposed(x, y, z + 1)) ||
-      (!hasBlockAt(x, y, z - 1) && isExposed(x, y, z - 1))
+    const stack = [[x, y, z]]
+    const seen = []
 
-    exposedCache[key] = exposed
-    return exposed
+    while (stack.length > 0) {
+      const [px, py, pz] = stack.pop()
+
+      if (hasBlockAt(px, py, pz)) continue
+
+      // Check if point is at grids edges
+      if (px <= xMin || px >= xMax || py <= yMin || py >= xMax || pz <= zMin || pz >= zMax) {
+        exposedCache[key] = true
+        return true
+      }
+
+      // Point has already been
+      if (!!seen.find(([sx, sy, sz]) => sx === py && sy === py && sz === pz)) continue
+      seen.push([px, py, pz])
+
+      // Check if neigbour points are exposed by adding them to the stack
+      stack.push([px + 1, py, pz])
+      stack.push([px - 1, py, pz])
+      stack.push([px, py + 1, pz])
+      stack.push([px, py - 1, pz])
+      stack.push([px, py, pz + 1])
+      stack.push([px, py, pz - 1])
+    }
+
+    exposedCache[key] = false
+    return false
   }
 
   const exposed = data.map(([x, y, z]) => {
-    const rr = hasBlockAt(x - 1, y, z) ? 0 : 1
-    const ll = hasBlockAt(x + 1, y, z) ? 0 : 1
-    const tt = hasBlockAt(x, y + 1, z) ? 0 : 1
-    const dd = hasBlockAt(x, y - 1, z) ? 0 : 1
-    const ff = hasBlockAt(x, y, z + 1) ? 0 : 1
-    const bb = hasBlockAt(x, y, z - 1) ? 0 : 1
+    const rr = hasBlockAt(x + 1, y, z) && isExposed(x + 1, y, z)
+    const ll = hasBlockAt(x - 1, y, z) && isExposed(x - 1, y, z)
+    const tt = hasBlockAt(x, y + 1, z) && isExposed(x, y + 1, z)
+    const dd = hasBlockAt(x, y - 1, z) && isExposed(x, y - 1, z)
+    const ff = hasBlockAt(x, y, z + 1) && isExposed(x, y, z + 1)
+    const bb = hasBlockAt(x, y, z - 1) && isExposed(x, y, z - 1)
 
-    return isExposed(x, y, z) ? rr + ll + tt + dd + ff + bb : 0
+    return rr ? 1 : 0 + ll ? 1 : 0 + tt ? 1 : 0 + dd ? 1 : 0 + ff ? 1 : 0 + bb ? 1 : 0
   })
 
   return _.sum(exposed)
