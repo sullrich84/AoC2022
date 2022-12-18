@@ -28,65 +28,45 @@ const solve1 = ({ data }) => {
 
 const solve2 = ({ data }) => {
   // 0:21 grid
-  const xMin = _.min(data.map(([x, y, z]) => x))
-  const xMax = _.max(data.map(([x, y, z]) => x))
-  const yMin = _.min(data.map(([x, y, z]) => y))
-  const yMax = _.max(data.map(([x, y, z]) => y))
-  const zMin = _.min(data.map(([x, y, z]) => z))
-  const zMax = _.max(data.map(([x, y, z]) => z))
+  // const xMin = _.min(data.map(([x, y, z]) => x))
+  // const xMax = _.max(data.map(([x, y, z]) => x))
+  // const yMin = _.min(data.map(([x, y, z]) => y))
+  // const yMax = _.max(data.map(([x, y, z]) => y))
+  // const zMin = _.min(data.map(([x, y, z]) => z))
+  // const zMax = _.max(data.map(([x, y, z]) => z))
 
-  const hasBlockAt = (x, y, z) => (data.find(([ex, ey, ez]) => x === ex && y === ey && z === ez) ? true : false)
+  // const isExposed = (x, y, z) => {
+  //   const exposedRight = data.find(([fx, fy, fz]) => fx < x && fy == y && fz == z) ? 0 : 1
+  //   const exposedLeft = data.find(([fx, fy, fz]) => fx > x && fy == y && fz == z) ? 0 : 1
 
-  const exposedCache = {}
-  const isExposed = (x, y, z) => {
-    const key = [x, y, z].join(":")
-    if (key in exposedCache) return exposedCache[key]
+  //   const exposedTop = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) ? 0 : 1
+  //   const exposedBottom = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) ? 0 : 1
 
-    if (hasBlockAt(x, y, z)) {
-      exposedCache[key] = false
-      return false
-    }
+  //   const exposedFront = data.find(([fx, fy, fz]) => fx == x && fy == y && fz < z) ? 0 : 1
+  //   const exposedBack = data.find(([fx, fy, fz]) => fx == x && fy == y && fz > z) ? 0 : 1
 
-    const stack = [[x, y, z]]
-    const seen = []
+  //   const exposedSomewere = exposedRight || exposedLeft || exposedTop || exposedBottom || exposedFront || exposedBack
+  //   return exposedSomewere
+  // }
 
-    while (stack.length > 0) {
-      const [px, py, pz] = stack.pop()
-
-      if (hasBlockAt(px, py, pz)) continue
-
-      // Check if point is at grids edges
-      if (px <= xMin || px >= xMax || py <= yMin || py >= xMax || pz <= zMin || pz >= zMax) {
-        exposedCache[key] = true
-        return true
-      }
-
-      // Point has already been
-      if (!!seen.find(([sx, sy, sz]) => sx === py && sy === py && sz === pz)) continue
-      seen.push([px, py, pz])
-
-      // Check if neigbour points are exposed by adding them to the stack
-      stack.push([px + 1, py, pz])
-      stack.push([px - 1, py, pz])
-      stack.push([px, py + 1, pz])
-      stack.push([px, py - 1, pz])
-      stack.push([px, py, pz + 1])
-      stack.push([px, py, pz - 1])
-    }
-
-    exposedCache[key] = false
-    return false
+  const visible = (x, y, z) => {
+    const exposedRight = data.find(([fx, fy, fz]) => fx < x && fy == y && fz == z) === undefined
+    const exposedLeft = data.find(([fx, fy, fz]) => fx > x && fy == y && fz == z) === undefined
+    const exposedTop = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) === undefined
+    const exposedBottom = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) === undefined
+    const exposedFront = data.find(([fx, fy, fz]) => fx == x && fy == y && fz < z) === undefined
+    const exposedBack = data.find(([fx, fy, fz]) => fx == x && fy == y && fz > z) === undefined
+    return exposedRight || exposedLeft || exposedTop || exposedBottom || exposedFront || exposedBack
   }
 
-  const exposed = data.map(([x, y, z]) => {
-    const rr = hasBlockAt(x + 1, y, z) && isExposed(x + 1, y, z)
-    const ll = hasBlockAt(x - 1, y, z) && isExposed(x - 1, y, z)
-    const tt = hasBlockAt(x, y + 1, z) && isExposed(x, y + 1, z)
-    const dd = hasBlockAt(x, y - 1, z) && isExposed(x, y - 1, z)
-    const ff = hasBlockAt(x, y, z + 1) && isExposed(x, y, z + 1)
-    const bb = hasBlockAt(x, y, z - 1) && isExposed(x, y, z - 1)
-
-    return rr ? 1 : 0 + ll ? 1 : 0 + tt ? 1 : 0 + dd ? 1 : 0 + ff ? 1 : 0 + bb ? 1 : 0
+  const exposed = data.map(([ex, ey, ez]) => {
+    const rr = data.find(([x, y, z]) => x === ex + 1 && y === ey && z === ez) ? 0 : visible(ex + 1, ey, ez) ? 1 : 0
+    const ll = data.find(([x, y, z]) => x === ex - 1 && y === ey && z === ez) ? 0 : visible(ex - 1, ey, ez) ? 1 : 0
+    const tt = data.find(([x, y, z]) => x === ex && y === ey + 1 && z === ez) ? 0 : visible(ex, ey + 1, ez) ? 1 : 0
+    const dd = data.find(([x, y, z]) => x === ex && y === ey - 1 && z === ez) ? 0 : visible(ex, ey - 1, ez) ? 1 : 0
+    const ff = data.find(([x, y, z]) => x === ex && y === ey && z === ez + 1) ? 0 : visible(ex, ey, ez + 1) ? 1 : 0
+    const bb = data.find(([x, y, z]) => x === ex && y === ey && z === ez - 1) ? 0 : visible(ex, ey, ez - 1) ? 1 : 0
+    return rr + ll + tt + dd + ff + bb
   })
 
   return _.sum(exposed)
