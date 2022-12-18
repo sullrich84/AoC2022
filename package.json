@@ -8,8 +8,7 @@
   "type": "module",
   "dependencies": {
     "lodash": "^4.17.21",
-    "node-dijkstra": "^2.5.0",
-    "typescript": "^4.9.3"
+    "node-dijkstra": "^2.5.0"
   },
   "scripts": {
     "day18": "node day18/solve.js",
