@@ -19,10 +19,10 @@ const solve1 = ({ data }) => {
   return _.sum(exposed)
 }
 
-// const sRes1 = [{ data: sample }].map(solve1)
-// const res1 = [{ data: data }].map(solve1)
+const sRes1 = [{ data: sample }].map(solve1)
+const res1 = [{ data: data }].map(solve1)
 
-// console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
@@ -48,14 +48,10 @@ const solve2 = ({ data }) => {
     while (queue.length > 0) {
       const [px, py, pz] = queue.pop()
 
-      if (has(seen, [px, py, pz])) {
-        continue
-      }
+      if (has(seen, [px, py, pz])) continue
       seen.push([px, py, pz])
 
-      if (has(data, [px, py, pz])) {
-        continue
-      }
+      if (has(data, [px, py, pz])) continue
 
       if (px >= xMax || px <= xMin || py >= yMax || py <= yMin || pz >= zMax || pz <= zMin) {
         cache[key] = true
@@ -75,19 +71,19 @@ const solve2 = ({ data }) => {
   }
 
   const exposed = data.map(([ex, ey, ez], idx) => {
-    const rr = data.find(([x, y, z]) => x === ex + 1 && y === ey && z === ez) ? 0 : visible(ex + 1, ey, ez) ? 1 : 0
-    const ll = data.find(([x, y, z]) => x === ex - 1 && y === ey && z === ez) ? 0 : visible(ex - 1, ey, ez) ? 1 : 0
-    const tt = data.find(([x, y, z]) => x === ex && y === ey + 1 && z === ez) ? 0 : visible(ex, ey + 1, ez) ? 1 : 0
-    const dd = data.find(([x, y, z]) => x === ex && y === ey - 1 && z === ez) ? 0 : visible(ex, ey - 1, ez) ? 1 : 0
-    const ff = data.find(([x, y, z]) => x === ex && y === ey && z === ez + 1) ? 0 : visible(ex, ey, ez + 1) ? 1 : 0
-    const bb = data.find(([x, y, z]) => x === ex && y === ey && z === ez - 1) ? 0 : visible(ex, ey, ez - 1) ? 1 : 0
+    // console.log(`Checking item ${idx} of ${data.length}`)
+    const rr = !data.includes([ex + 1, ey, ez]) && visible(ex + 1, ey, ez) ? 1 : 0
+    const ll = !data.includes([ex - 1, ey, ez]) && visible(ex - 1, ey, ez) ? 1 : 0
+    const tt = !data.includes([ex, ey + 1, ez]) && visible(ex, ey + 1, ez) ? 1 : 0
+    const dd = !data.includes([ex, ey - 1, ez]) && visible(ex, ey - 1, ez) ? 1 : 0
+    const ff = !data.includes([ex, ey, ez + 1]) && visible(ex, ey, ez + 1) ? 1 : 0
+    const bb = !data.includes([ex, ey, ez - 1]) && visible(ex, ey, ez - 1) ? 1 : 0
     return rr + ll + tt + dd + ff + bb
   })
 
   return _.sum(exposed)
 }
 
-// > 2473
 const sRes2 = [{ data: sample }].map(solve2)
 const res2 = [{ data: data }].map(solve2)
 
