@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day X")
+console.log("🎄 Day 18")
 
 /// Part 1
 
@@ -60,18 +60,19 @@ const solve2 = ({ data }) => {
   }
 
   const exposed = data.map(([ex, ey, ez]) => {
-    const rr = data.find(([x, y, z]) => x === ex + 1 && y === ey && z === ez) ? 0 : visible(ex + 1, ey, ez) ? 1 : 0
-    const ll = data.find(([x, y, z]) => x === ex - 1 && y === ey && z === ez) ? 0 : visible(ex - 1, ey, ez) ? 1 : 0
-    const tt = data.find(([x, y, z]) => x === ex && y === ey + 1 && z === ez) ? 0 : visible(ex, ey + 1, ez) ? 1 : 0
-    const dd = data.find(([x, y, z]) => x === ex && y === ey - 1 && z === ez) ? 0 : visible(ex, ey - 1, ez) ? 1 : 0
-    const ff = data.find(([x, y, z]) => x === ex && y === ey && z === ez + 1) ? 0 : visible(ex, ey, ez + 1) ? 1 : 0
-    const bb = data.find(([x, y, z]) => x === ex && y === ey && z === ez - 1) ? 0 : visible(ex, ey, ez - 1) ? 1 : 0
+    const rr =   (ex + 1, ey, ez) ? 1 : 0
+    const ll = visible(ex - 1, ey, ez) ? 1 : 0
+    const tt = visible(ex, ey + 1, ez) ? 1 : 0
+    const dd = visible(ex, ey - 1, ez) ? 1 : 0
+    const ff = visible(ex, ey, ez + 1) ? 1 : 0
+    const bb = visible(ex, ey, ez - 1) ? 1 : 0
     return rr + ll + tt + dd + ff + bb
   })
 
   return _.sum(exposed)
 }
 
+// > 2473
 const sRes2 = [{ data: sample }].map(solve2)
 const res2 = [{ data: data }].map(solve2)
 
