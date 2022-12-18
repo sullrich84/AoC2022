@@ -27,45 +27,60 @@ const solve1 = ({ data }) => {
 /// Part 2
 
 const solve2 = ({ data }) => {
-  // 0:21 grid
-  // const xMin = _.min(data.map(([x, y, z]) => x))
-  // const xMax = _.max(data.map(([x, y, z]) => x))
-  // const yMin = _.min(data.map(([x, y, z]) => y))
-  // const yMax = _.max(data.map(([x, y, z]) => y))
-  // const zMin = _.min(data.map(([x, y, z]) => z))
-  // const zMax = _.max(data.map(([x, y, z]) => z))
+  const has = (collection, [x, y, z]) =>
+    collection.find(([fx, fy, fz]) => fx === x && fy === y && fz === z) !== undefined
 
-  // const isExposed = (x, y, z) => {
-  //   const exposedRight = data.find(([fx, fy, fz]) => fx < x && fy == y && fz == z) ? 0 : 1
-  //   const exposedLeft = data.find(([fx, fy, fz]) => fx > x && fy == y && fz == z) ? 0 : 1
+  const xMin = _.min(data.map(([x, y, z]) => x))
+  const xMax = _.max(data.map(([x, y, z]) => x))
+  const yMin = _.min(data.map(([x, y, z]) => y))
+  const yMax = _.max(data.map(([x, y, z]) => y))
+  const zMin = _.min(data.map(([x, y, z]) => z))
+  const zMax = _.max(data.map(([x, y, z]) => z))
 
-  //   const exposedTop = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) ? 0 : 1
-  //   const exposedBottom = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) ? 0 : 1
-
-  //   const exposedFront = data.find(([fx, fy, fz]) => fx == x && fy == y && fz < z) ? 0 : 1
-  //   const exposedBack = data.find(([fx, fy, fz]) => fx == x && fy == y && fz > z) ? 0 : 1
-
-  //   const exposedSomewere = exposedRight || exposedLeft || exposedTop || exposedBottom || exposedFront || exposedBack
-  //   return exposedSomewere
-  // }
-
+  const cache = {}
   const visible = (x, y, z) => {
-    const exposedRight = data.find(([fx, fy, fz]) => fx < x && fy == y && fz == z) === undefined
-    const exposedLeft = data.find(([fx, fy, fz]) => fx > x && fy == y && fz == z) === undefined
-    const exposedTop = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) === undefined
-    const exposedBottom = data.find(([fx, fy, fz]) => fx == x && fy < y && fz == z) === undefined
-    const exposedFront = data.find(([fx, fy, fz]) => fx == x && fy == y && fz < z) === undefined
-    const exposedBack = data.find(([fx, fy, fz]) => fx == x && fy == y && fz > z) === undefined
-    return exposedRight || exposedLeft || exposedTop || exposedBottom || exposedFront || exposedBack
+    const key = [x, y, z].join(":")
+    if (key in cache) return cache[key]
+
+    const queue = [[x, y, z]]
+    const seen = []
+
+    while (queue.length > 0) {
+      const [px, py, pz] = queue.pop()
+
+      if (has(seen, [px, py, pz])) {
+        continue
+      }
+      seen.push([px, py, pz])
+
+      if (has(data, [px, py, pz])) {
+        continue
+      }
+
+      if (px >= xMax || px <= xMin || py >= yMax || py <= yMin || pz >= zMax || pz <= zMin) {
+        cache[key] = true
+        return true
+      }
+
+      queue.push([px + 1, py, pz])
+      queue.push([px - 1, py, pz])
+      queue.push([px, py + 1, pz])
+      queue.push([px, py - 1, pz])
+      queue.push([px, py, pz + 1])
+      queue.push([px, py, pz - 1])
+    }
+
+    cache[key] = false
+    return false
   }
 
-  const exposed = data.map(([ex, ey, ez]) => {
-    const rr =   (ex + 1, ey, ez) ? 1 : 0
-    const ll = visible(ex - 1, ey, ez) ? 1 : 0
-    const tt = visible(ex, ey + 1, ez) ? 1 : 0
-    const dd = visible(ex, ey - 1, ez) ? 1 : 0
-    const ff = visible(ex, ey, ez + 1) ? 1 : 0
-    const bb = visible(ex, ey, ez - 1) ? 1 : 0
+  const exposed = data.map(([ex, ey, ez], idx) => {
+    const rr = data.find(([x, y, z]) => x === ex + 1 && y === ey && z === ez) ? 0 : visible(ex + 1, ey, ez) ? 1 : 0
+    const ll = data.find(([x, y, z]) => x === ex - 1 && y === ey && z === ez) ? 0 : visible(ex - 1, ey, ez) ? 1 : 0
+    const tt = data.find(([x, y, z]) => x === ex && y === ey + 1 && z === ez) ? 0 : visible(ex, ey + 1, ez) ? 1 : 0
+    const dd = data.find(([x, y, z]) => x === ex && y === ey - 1 && z === ez) ? 0 : visible(ex, ey - 1, ez) ? 1 : 0
+    const ff = data.find(([x, y, z]) => x === ex && y === ey && z === ez + 1) ? 0 : visible(ex, ey, ez + 1) ? 1 : 0
+    const bb = data.find(([x, y, z]) => x === ex && y === ey && z === ez - 1) ? 0 : visible(ex, ey, ez - 1) ? 1 : 0
     return rr + ll + tt + dd + ff + bb
   })
 
