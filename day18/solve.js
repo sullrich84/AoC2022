@@ -71,7 +71,7 @@ const solve2 = ({ data }) => {
   }
 
   return data
-    .map(([ex, ey, ez], idx) => {
+    .map(([ex, ey, ez]) => {
       const rr = !data.includes([ex + 1, ey, ez]) && visible(ex + 1, ey, ez) ? 1 : 0
       const ll = !data.includes([ex - 1, ey, ez]) && visible(ex - 1, ey, ez) ? 1 : 0
       const tt = !data.includes([ex, ey + 1, ez]) && visible(ex, ey + 1, ez) ? 1 : 0
