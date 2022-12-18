@@ -5,10 +5,6 @@ console.log("🎄 Day X")
 
 /// Part 1
 
-const has = (collection, [x, y, z]) => {
-  collection.filter(([cx, cy, cz]) => cx === x && cy === y && cz === z)
-}
-
 const solve1 = ({ data }) => {
   const exposed = data.map(([ex, ey, ez]) => {
     const rr = data.find(([x, y, z]) => x === ex + 1 && y === ey && z === ez) ? 0 : 1
