@@ -3,6 +3,19 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 20")
 
+const swap = (array, elem) => {
+  if (elem.val === 0) return array
+  var temp = [...array]
+
+  const oldIdx = array.findIndex(({ id }) => id === elem.id)
+  const newIdx = (oldIdx + elem.val) % (array.length - 1)
+
+  temp.splice(oldIdx, 1)
+  temp.splice(newIdx, 0, elem)
+
+  return temp
+}
+
 /// Part 1
 
 const solve1 = ({ numbers }) => {
@@ -10,30 +23,15 @@ const solve1 = ({ numbers }) => {
     return { id, val }
   })
 
-  const len = elements.length
-
-  const swap = (array, elem) => {
-    if (elem.val === 0) return array
-    var temp = [...array]
-
-    const oldIdx = _.findIndex(array, ({ id }) => id === elem.id)
-    const newIdx = (oldIdx + elem.val) % (len - 1)
-
-    temp.splice(oldIdx, 1)
-    temp.splice(newIdx, 0, elem)
-
-    return temp
-  }
-
-  for (var i = 0; i < len; i++) {
-    const { id, val } = elements.filter(({ id }) => id === i)[0]
-    elements = swap(elements, { id, val })
+  for (var i = 0; i < elements.length; i++) {
+    const element = elements.find(({ id }) => id === i)
+    elements = swap(elements, element)
   }
 
   const zero = elements.findIndex(({ val }) => val === 0)
 
   return [1000, 2000, 3000]
-    .map((shift) => (zero + shift) % len)
+    .map((shift) => (zero + shift) % elements.length)
     .map((idx) => elements[idx].val)
     .reduce((acc, val) => acc + val, 0)
 }
@@ -46,38 +44,19 @@ console.log("Sample:", sRes1, "Task:", res1)
 /// Part 2
 
 const solve2 = ({ numbers }) => {
-  const decryptionKey = 811589153
-
   var elements = numbers.map((val, id) => {
-    return { id, val: val * decryptionKey }
+    return { id, val: val * 811589153 }
   })
 
-  const len = elements.length
-
-  const swap = (array, elem) => {
-    if (elem.val === 0) return array
-    var temp = [...array]
-
-    const oldIdx = _.findIndex(array, ({ id }) => id === elem.id)
-    const newIdx = (oldIdx + elem.val) % (len - 1)
-
-    temp.splice(oldIdx, 1)
-    temp.splice(newIdx, 0, elem)
-
-    return temp
-  }
-
-  for (var m = 0; m < 10; m++) {
-    for (var i = 0; i < len; i++) {
-      const { id, val } = elements.filter(({ id }) => id === i)[0]
-      elements = swap(elements, { id, val })
-    }
+  for (var i = 0; i < elements.length * 10; i++) {
+    const { id, val } = elements.filter(({ id }) => id === i % elements.length)[0]
+    elements = swap(elements, { id, val })
   }
 
   const zero = elements.findIndex(({ val }) => val === 0)
 
   return [1000, 2000, 3000]
-    .map((shift) => (zero + shift) % len)
+    .map((shift) => (zero + shift) % elements.length)
     .map((idx) => elements[idx].val)
     .reduce((acc, val) => acc + val, 0)
 }
