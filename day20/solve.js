@@ -8,23 +8,29 @@ console.log("🎄 Day X")
 const solve1 = ({ numbers }) => {
   console.log(numbers)
 
-  var set = [...numbers]
-  const len = set.length
+  var elements = numbers.map((val, id) => {
+    return { id, val }
+  })
 
-  for (var i = 0; i < numbers.length; i++) {
-    const shift = numbers[i]
+  const len = elements.length
 
-    const sourceIdx = set.indexOf(shift)
-    const sourceVal = set[sourceIdx]
-    const destIdx = (sourceIdx + shift) % len
-    const destVal = set[destIdx]
-
-    // Drop source
-    set.splice(sourceIdx)
+  const swap = (array, elem, idx) => {
+    var temp = _.without(array, elem)
+    temp.splice(idx, 0, elem)
+    return temp
   }
 
-  const zeroIndex = list.findIndex((el) => el.val === 0)
-  const keys = [1000, 2000, 3000].map((x) => list[(zeroIndex + x) % list.length].val)
+  for (var i = 0; i < len; i++) {
+    const { id, val } = elements.filter(({ id }) => id === i)[0]
+
+    if (val > 0) {
+      console.log(`Moving ${val} ${val} to the right`)
+      elements = swap(elements, id, val)
+    } else if (val < 0) {
+      console.log(`Moving ${val} ${val * -1} to the left`)
+    }
+  }
+
   return 0
 }
 
