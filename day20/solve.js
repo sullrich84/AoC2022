@@ -1,13 +1,11 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day X")
+console.log("🎄 Day 20")
 
 /// Part 1
 
 const solve1 = ({ numbers }) => {
-  console.log(numbers)
-
   var elements = numbers.map((val, id) => {
     return { id, val }
   })
@@ -16,14 +14,14 @@ const solve1 = ({ numbers }) => {
 
   const swap = (array, elem) => {
     if (elem.val === 0) return array
-
     var temp = [...array]
-    const idx = _.findIndex(array, ({ id }) => id === elem.id)
-    temp.splice(idx, 1)
 
-    const newIdx = (idx + elem.val) % len
+    const oldIdx = _.findIndex(array, ({ id }) => id === elem.id)
+    const newIdx = (oldIdx + elem.val) % (len - 1)
+
+    temp.splice(oldIdx, 1)
     temp.splice(newIdx, 0, elem)
-    console.log(temp.map(({ val }) => val).join())
+
     return temp
   }
 
@@ -32,11 +30,16 @@ const solve1 = ({ numbers }) => {
     elements = swap(elements, { id, val })
   }
 
-  return 0
+  const zero = elements.findIndex(({ val }) => val === 0)
+
+  return [1000, 2000, 3000]
+    .map((shift) => (zero + shift) % len)
+    .map((idx) => elements[idx].val)
+    .reduce((acc, val) => acc + val, 0)
 }
 
 const sRes1 = [{ numbers: sample }].map(solve1)
-const res1 = 0 //[{ data: data }].map(solve1)
+const res1 = [{ numbers: data }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
 
