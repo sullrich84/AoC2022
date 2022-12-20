@@ -3,29 +3,24 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 20")
 
-const swap = (array, elem) => {
-  if (elem.val === 0) return array
-  var temp = [...array]
+const swap = (array, item) => {
+  if (item.val === 0) return
 
-  const oldIdx = array.findIndex(({ id }) => id === elem.id)
-  const newIdx = (oldIdx + elem.val) % (array.length - 1)
+  const oldIdx = array.findIndex(({ id }) => id === item.id)
+  const newIdx = (oldIdx + item.val) % (array.length - 1)
 
-  temp.splice(oldIdx, 1)
-  temp.splice(newIdx, 0, elem)
-
-  return temp
+  array.splice(oldIdx, 1)
+  array.splice(newIdx, 0, item)
 }
 
 /// Part 1
 
 const solve1 = ({ numbers }) => {
-  var elements = numbers.map((val, id) => {
-    return { id, val }
-  })
+  const elements = numbers.map((val, id) => ({ id, val }))
 
   for (var i = 0; i < elements.length; i++) {
     const element = elements.find(({ id }) => id === i)
-    elements = swap(elements, element)
+    swap(elements, element)
   }
 
   const zero = elements.findIndex(({ val }) => val === 0)
@@ -44,13 +39,11 @@ console.log("Sample:", sRes1, "Task:", res1)
 /// Part 2
 
 const solve2 = ({ numbers }) => {
-  var elements = numbers.map((val, id) => {
-    return { id, val: val * 811589153 }
-  })
+  const elements = numbers.map((val, id) => ({ id, val: val * 811589153 }))
 
   for (var i = 0; i < elements.length * 10; i++) {
-    const { id, val } = elements.filter(({ id }) => id === i % elements.length)[0]
-    elements = swap(elements, { id, val })
+    const element = elements.filter(({ id }) => id === i % elements.length)[0]
+    swap(elements, element)
   }
 
   const zero = elements.findIndex(({ val }) => val === 0)
