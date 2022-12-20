@@ -15,13 +15,15 @@ const solve1 = ({ numbers }) => {
   const len = elements.length
 
   const swap = (array, elem) => {
+    if (elem.val === 0) return array
+
     var temp = [...array]
     const idx = _.findIndex(array, ({ id }) => id === elem.id)
     temp.splice(idx, 1)
 
     const newIdx = (idx + elem.val) % len
     temp.splice(newIdx, 0, elem)
-    console.log(temp.map(({val}) => val).join())
+    console.log(temp.map(({ val }) => val).join())
     return temp
   }
 
