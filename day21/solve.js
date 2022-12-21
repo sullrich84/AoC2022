@@ -81,23 +81,32 @@ const solve2 = ({ data }) => {
   const rn1 = tree.find(({ id }) => id === rd1)
   const rn2 = tree.find(({ id }) => id === rd2)
 
+  var x = 0
+  var i = 1000000000000
 
-  var i = 3087390115700
+  var xHist = []
 
   while (true) {
-    const rres1 = calc(rn1, i)
-    const rres2 = calc(rn2, i)
+    const rres1 = calc(rn1, x)
+    const rres2 = calc(rn2, x)
 
     const diff = rres1 - rres2
-    console.log(i, diff)
+    console.log(x, diff)
 
     if (diff === 0) break
 
-    // Started with a higher number and reduced it when diff < 0
-    i += 1
+    if (diff < 0) {
+      i = _.max([Math.ceil(i / 100), 1])
+      x = _.max(xHist)
+      xHist = [x]
+      continue
+    }
+
+    xHist.push(x)
+    x += i
   }
 
-  return i
+  return x
 }
 
 const sRes2 = [{ data: data }].map(solve2)
