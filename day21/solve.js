@@ -9,9 +9,7 @@ const solve1 = ({ data }) => {
   const root = data.find(({ id }) => id === "root")
 
   const calc = ({ deps, val }) => {
-    if (deps === undefined) {
-      return val
-    }
+    if (deps === undefined) return val
 
     const [d1, d2] = deps
     const n1 = data.find(({ id }) => id === d1)
@@ -36,63 +34,73 @@ const solve1 = ({ data }) => {
 const solve2 = ({ data }) => {
   const tree = data.map((e) => {
     if (e.id === "root") return { ...e, val: e.val.replace("+", "=") }
-    if (e.id === "humn") return { ...e, val: NaN }
+    if (e.id === "humn") return { ...e, val: undefined }
     return e
   })
 
-  const treeRev = tree.map((e) => {
-    if (!e.deps) return e
-    var vals = e.val.split(" ")
-    switch (vals[1]) {
-      case "+":
-        return { ...e, val: vals[0] + " - " + vals[2] }
-      case "-":
-        return { ...e, val: vals[0] + " + " + vals[2] }
-      case "*":
-        return { ...e, val: vals[0] + " / " + vals[2] }
-      case "/":
-        return { ...e, val: vals[0] + " * " + vals[2] }
-      default:
-        return e
-    }
-  })
+  // const treeRev = tree.map((e) => {
+  //   if (!e.deps) return e
+  //   var vals = e.val.split(" ")
+  //   switch (vals[1]) {
+  //     case "+":
+  //       return { ...e, val: vals[0] + " - " + vals[2] }
+  //     case "-":
+  //       return { ...e, val: vals[0] + " + " + vals[2] }
+  //     case "*":
+  //       return { ...e, val: vals[0] + " / " + vals[2] }
+  //     case "/":
+  //       return { ...e, val: vals[0] + " * " + vals[2] }
+  //     default:
+  //       return e
+  //   }
+  // })
 
   const root = tree.find(({ id }) => id === "root")
   const humn = tree.find(({ id }) => id === "humn")
 
-  const calc = ({ deps, val }) => {
+  const calc = ({ id, deps, val }, humnVal) => {
     if (deps === undefined) {
+      if (id === "humn") {
+        return humnVal
+      }
+
       return val
     }
 
     const [d1, d2] = deps
-    const n1 = data.find(({ id }) => id === d1)
-    const n2 = data.find(({ id }) => id === d2)
+    const n1 = tree.find(({ id }) => id === d1)
+    const n2 = tree.find(({ id }) => id === d2)
 
-    const operation = `const ${d1} = ${calc(n1)}; const ${d2} = ${calc(n2)}; ${val}`
+    const operation = `const ${d1} = ${calc(n1, humnVal)}; const ${d2} = ${calc(n2, humnVal)}; ${val}`
     const res = eval(operation)
 
     return res
   }
 
-  const [hd1, hd2] = humn.deps
-  const hn1 = tree.find(({ id }) => id === hd1)
-  const hn2 = tree.find(({ id }) => id === hd2)
-
   const [rd1, rd2] = root.deps
   const rn1 = tree.find(({ id }) => id === rd1)
   const rn2 = tree.find(({ id }) => id === rd2)
 
-  const rres1 = calc(rn1)
-  const rres2 = calc(rn2)
 
-  const hres1 = calc(hn1)
-  const hres2 = calc(hn2)
+  var i = 3087390115700
 
-  console.log("x")
+  while (true) {
+    const rres1 = calc(rn1, i)
+    const rres2 = calc(rn2, i)
+
+    const diff = rres1 - rres2
+    console.log(i, diff)
+
+    if (diff === 0) break
+
+    // Started with a higher number and reduced it when diff < 0
+    i += 1
+  }
+
+  return i
 }
 
-const sRes2 = [{ data: sample }].map(solve2)
+const sRes2 = [{ data: data }].map(solve2)
 const res2 = 0 //[{ data: data }].map(solve2)
 
 console.log("Sample:", sRes2, "Task:", res2)
