@@ -1,5 +1,5 @@
 import _ from "lodash"
-import data, { sample } from "./data.js"
+import data, { sample, sample2 } from "./data.js"
 
 console.log("🎄 Day 22")
 
@@ -106,25 +106,29 @@ const solve1 = ({ mapData, moveData }) => {
   })
 
   var pos = [0, map[0].findIndex((t) => t !== tiles.void)]
+  var dir = "U"
   const move = ["R", ...moveData]
-  var [dir, steps] = [move.shift(), parseInt(move.shift())]
-
   /// Move along all the commands
 
   while (move.length > 0) {
-    console.log(`Moving ${steps} steps ${dir}`)
+    const nextDir = move.shift()
+    // console.log(`Facing ${dir} now turning ${nextDir}`)
+    dir = rotate[dir][nextDir]
+    // console.log(`Now facing ${dir}`)
+    var steps = parseInt(move.shift())
 
     for (var s = 0; s < steps; s++) {
       if (map[pos[0]][pos[1]] !== tiles.floor) {
         throw "invalid move"
       }
 
-      console.log("Moved to", pos)
+      // console.log("Moved to", pos)
       var nextPos = nextPosition(map, dir, pos)
       var nextTile = getTile(map, nextPos)
 
       if (nextTile === tiles.wall) {
         // Hit a wall => stop
+        // console.log("Hot wall, end")
         break
       } else if (nextTile === tiles.floor) {
         // Move
@@ -142,23 +146,23 @@ const solve1 = ({ mapData, moveData }) => {
 
       trace[pos[0]][pos[1]] = "•"
     }
-
-    const nextDir = move.shift()
-    dir = rotate[dir][nextDir]
-    steps = parseInt(move.shift())
   }
 
   const row = pos[0] + 1
   const col = pos[1] + 1
   const facing = rotate[dir].facing
 
+  console.log("row", row)
+  console.log("col", col)
+  console.log("facing", facing)
+
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
-// < 109102 < 200010
+// 109100 < 109102 < 200010
 
-const sRes1 = 0 //[{ mapData: sample[0], moveData: sample[1] }].map(solve1)
-const res1 = [{ mapData: data[0], moveData: data[1] }].map(solve1)
+const sRes1 = [{ mapData: sample2[0], moveData: sample2[1] }].map(solve1)
+const res1 = 0 //[{ mapData: data[0], moveData: data[1] }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
 
