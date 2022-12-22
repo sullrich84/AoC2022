@@ -39,25 +39,25 @@ const nextPosition = (map, dir, [y, x]) => {
     case "R":
       var xx = x + 1
       if (xx > map[y].length - 1) {
-        return warp(map, dir, [x, y])
+        return warp(map, dir, [y, x])
       }
       return [y, xx]
     case "L":
       var xx = x - 1
       if (xx < 0) {
-        return warp(map, dir, [x, y])
+        return warp(map, dir, [y, x])
       }
       return [y, xx]
     case "U":
       var yy = y - 1
       if (yy < 0) {
-        return warp(map, dir, [x, y])
+        return warp(map, dir, [y, x])
       }
       return [yy, x]
     case "D":
       var yy = y + 1
       if (yy > map.length - 1) {
-        return warp(map, dir, [x, y])
+        return warp(map, dir, [y, x])
       }
       return [yy, x]
   }
@@ -65,6 +65,12 @@ const nextPosition = (map, dir, [y, x]) => {
 
 const getTile = (map, [y, x]) => {
   return map[y][x]
+}
+
+const preview = (map) => {
+  map.forEach((col) => {
+    console.log(col.join(""))
+  })
 }
 
 const warp = (map, dir, [y, x]) => {
@@ -94,9 +100,16 @@ const solve1 = ({ mapData, moveData }) => {
     map.push(row.split("").map((t) => (t === " " ? tiles.void : t)))
   })
 
+  const trace = []
+  mapData.forEach((row) => {
+    trace.push(row.split("").map((t) => (t === " " ? tiles.void : t)))
+  })
+
   var pos = [0, map[0].findIndex((t) => t !== tiles.void)]
   const move = ["R", ...moveData]
   var [dir, steps] = [move.shift(), parseInt(move.shift())]
+
+  /// Move along all the commands
 
   while (move.length > 0) {
     console.log(`Moving ${steps} steps ${dir}`)
@@ -126,6 +139,8 @@ const solve1 = ({ mapData, moveData }) => {
         // Safe to warp
         pos = warpTarget
       }
+
+      trace[pos[0]][pos[1]] = "•"
     }
 
     const nextDir = move.shift()
@@ -140,7 +155,7 @@ const solve1 = ({ mapData, moveData }) => {
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
-// < 200010
+// < 109102 < 200010
 
 const sRes1 = 0 //[{ mapData: sample[0], moveData: sample[1] }].map(solve1)
 const res1 = [{ mapData: data[0], moveData: data[1] }].map(solve1)
