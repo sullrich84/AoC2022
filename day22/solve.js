@@ -38,44 +38,6 @@ const rotate = {
   },
 }
 
-const nextPosition = (map, dir, [y, x]) => {
-  switch (dir) {
-    case "R":
-      if (x + 1 > map[y].length - 1) return warp(map, dir, [y, x])
-      return [y, x + 1]
-    case "L":
-      if (x - 1 < 0) return warp(map, dir, [y, x])
-      return [y, x - 1]
-    case "U":
-      if (y - 1 < 0) return warp(map, dir, [y, x])
-      return [y - 1, x]
-    case "D":
-      if (y + 1 > map.length - 1) return warp(map, dir, [y, x])
-      return [y + 1, x]
-  }
-}
-
-const warp = (map, dir, [y, x]) => {
-  if (dir === "R") {
-    return [y, map[y].findIndex((t) => t !== tiles.void)]
-  }
-
-  if (dir === "L") {
-    const r = [...map[y]]
-    return [y, r.length - 1 - r.reverse().findIndex((t) => t !== tiles.void)]
-  }
-
-  if (dir === "U") {
-    const c = map.map((r) => r[x]).reverse()
-    return [map.length - 1 - c.findIndex((t) => t !== tiles.void), x]
-  }
-
-  if (dir === "D") {
-    const c = map.map((r) => r[x])
-    return [c.findIndex((t) => t !== tiles.void), x]
-  }
-}
-
 const solve1 = ({ mapData, moveData }) => {
   const map = []
   mapData.forEach((row) => {
@@ -86,6 +48,44 @@ const solve1 = ({ mapData, moveData }) => {
   mapData.forEach((row) => {
     trace.push(row.split("").map((t) => (t === " " ? tiles.void : t)))
   })
+
+  const nextPosition = (dir, [y, x]) => {
+    switch (dir) {
+      case "R":
+        if (x + 1 > map[y].length - 1) return warp(dir, [y, x])
+        return [y, x + 1]
+      case "L":
+        if (x - 1 < 0) return warp(dir, [y, x])
+        return [y, x - 1]
+      case "U":
+        if (y - 1 < 0) return warp(dir, [y, x])
+        return [y - 1, x]
+      case "D":
+        if (y + 1 > map.length - 1) return warp(dir, [y, x])
+        return [y + 1, x]
+    }
+  }
+
+  const warp = (dir, [y, x]) => {
+    if (dir === "R") {
+      return [y, map[y].findIndex((t) => t !== tiles.void)]
+    }
+
+    if (dir === "L") {
+      const r = [...map[y]]
+      return [y, r.length - 1 - r.reverse().findIndex((t) => t !== tiles.void)]
+    }
+
+    if (dir === "U") {
+      const c = map.map((r) => r[x]).reverse()
+      return [map.length - 1 - c.findIndex((t) => t !== tiles.void), x]
+    }
+
+    if (dir === "D") {
+      const c = map.map((r) => r[x])
+      return [c.findIndex((t) => t !== tiles.void), x]
+    }
+  }
 
   var pos = [0, map[0].findIndex((t) => t !== tiles.void)]
   const move = [...moveData]
@@ -102,19 +102,17 @@ const solve1 = ({ mapData, moveData }) => {
       trace[y][x] = rotate[dir].symbol
       // console.log(`(${s + 1}/${steps}) Standing on (${y}, ${x}) facing ${dir}`)
 
-      const [ny, nx] = nextPosition(map, dir, pos)
-      const nextTile = map[ny][nx]
+      const [ny, nx] = nextPosition(dir, pos)
 
       // Hit a wall
-      if (nextTile === tiles.wall) break
+      if (map[ny][nx] === tiles.wall) break
 
       // Set new position for next round
-      if (nextTile === tiles.floor) pos = [ny, nx]
+      if (map[ny][nx] === tiles.floor) pos = [ny, nx]
 
-      if (nextTile === tiles.void) {
-        const [wy, wx] = warp(map, dir, pos)
-
+      if (map[ny][nx] === tiles.void) {
         // Warped into wall. Stay where we are end end round
+        const [wy, wx] = warp(dir, pos)
         if (map[wy][wx] !== tiles.floor) break
 
         // Set warped target for next round
@@ -127,7 +125,7 @@ const solve1 = ({ mapData, moveData }) => {
   const col = pos[1] + 1
   const facing = rotate[dir].facing
 
-  console.log(trace.map((t) => t.join("")))
+  // console.log(trace.map((t) => t.join("")))
 
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
