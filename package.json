@@ -11,6 +11,7 @@
     "node-dijkstra": "^2.5.0"
   },
   "scripts": {
+    "day22": "node day22/solve.js",
     "day21": "node day21/solve.js",
     "day20": "node day20/solve.js",
     "day19": "node day19/solve.js",
