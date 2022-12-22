@@ -6,7 +6,7 @@ console.log("🎄 Day 22")
 /// Part 1
 
 const tiles = {
-  void: "░",
+  void: " ",
   floor: ".",
   wall: "#",
 }
@@ -16,21 +16,25 @@ const rotate = {
     R: "D",
     L: "U",
     facing: 0,
+    symbol: "→",
   },
   L: {
     R: "U",
     L: "D",
     facing: 2,
+    symbol: "←",
   },
   U: {
     R: "R",
     L: "L",
     facing: 3,
+    symbol: "↑",
   },
   D: {
     R: "L",
     L: "R",
     facing: 1,
+    symbol: "↓",
   },
 }
 
@@ -67,12 +71,6 @@ const getTile = (map, [y, x]) => {
   return map[y][x]
 }
 
-const preview = (map) => {
-  map.forEach((col) => {
-    console.log(col.join(""))
-  })
-}
-
 const warp = (map, dir, [y, x]) => {
   if (dir === "R") {
     return [y, map[y].findIndex((t) => t !== tiles.void)]
@@ -97,7 +95,7 @@ const warp = (map, dir, [y, x]) => {
 const solve1 = ({ mapData, moveData }) => {
   const map = []
   mapData.forEach((row) => {
-    map.push(row.split("").map((t) => (t === " " ? tiles.void : t)))
+    map.push(row.split(""))
   })
 
   const trace = []
@@ -106,45 +104,39 @@ const solve1 = ({ mapData, moveData }) => {
   })
 
   var pos = [0, map[0].findIndex((t) => t !== tiles.void)]
-  var dir = "U"
-  const move = ["R", ...moveData]
-  /// Move along all the commands
+  const move = [...moveData]
 
   while (move.length > 0) {
-    const nextDir = move.shift()
-    // console.log(`Facing ${dir} now turning ${nextDir}`)
-    dir = rotate[dir][nextDir]
-    // console.log(`Now facing ${dir}`)
-    var steps = parseInt(move.shift())
+    var [nextDir, steps] = [dir == null ? "R" : move.shift(), parseInt(move.shift())]
+    var dir = dir != null ? rotate[dir][nextDir] : "R"
 
     for (var s = 0; s < steps; s++) {
-      if (map[pos[0]][pos[1]] !== tiles.floor) {
-        throw "invalid move"
-      }
+      const [y, x] = pos
+      if (map[y][x] !== tiles.floor) throw "invalid move"
 
-      // console.log("Moved to", pos)
+      trace[y][x] = rotate[dir].symbol
+      console.log(`(${s + 1}/${steps}) Standing on (${y}, ${x}) facing ${dir}`)
+
       var nextPos = nextPosition(map, dir, pos)
       var nextTile = getTile(map, nextPos)
 
-      if (nextTile === tiles.wall) {
-        // Hit a wall => stop
-        // console.log("Hot wall, end")
-        break
-      } else if (nextTile === tiles.floor) {
-        // Move
+      // Hit a wall
+      if (nextTile === tiles.wall) break
+
+      if (nextTile === tiles.floor) {
+        // Set new position for next round
         pos = nextPos
-      } else if (nextTile === tiles.void) {
-        // Warp
-        const warpTarget = warp(map, dir, pos)
-        if (map[warpTarget[0]][warpTarget[1]] !== tiles.floor) {
-          // Warp => Hit a wall
-          break
-        }
-        // Safe to warp
-        pos = warpTarget
       }
 
-      trace[pos[0]][pos[1]] = "•"
+      if (nextTile === tiles.void) {
+        const [wy, wx] = warp(map, dir, pos)
+
+        // Warped into wall. Stay where we are end end round
+        if (map[wy][wx] !== tiles.floor) break
+
+        // Set warped target for next round
+        pos = [wy, wx]
+      }
     }
   }
 
@@ -152,17 +144,11 @@ const solve1 = ({ mapData, moveData }) => {
   const col = pos[1] + 1
   const facing = rotate[dir].facing
 
-  console.log("row", row)
-  console.log("col", col)
-  console.log("facing", facing)
-
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
-// 109100 < 109102 < 200010
-
-const sRes1 = [{ mapData: sample2[0], moveData: sample2[1] }].map(solve1)
-const res1 = 0 //[{ mapData: data[0], moveData: data[1] }].map(solve1)
+const sRes1 = [{ mapData: sample[0], moveData: sample[1] }].map(solve1)
+const res1 = [{ mapData: data[0], moveData: data[1] }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
 
