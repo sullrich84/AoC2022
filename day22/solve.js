@@ -55,10 +55,6 @@ const nextPosition = (map, dir, [y, x]) => {
   }
 }
 
-const getTile = (map, [y, x]) => {
-  return
-}
-
 const warp = (map, dir, [y, x]) => {
   if (dir === "R") {
     return [y, map[y].findIndex((t) => t !== tiles.void)]
@@ -104,7 +100,7 @@ const solve1 = ({ mapData, moveData }) => {
 
       // Visualization + Debug :)
       trace[y][x] = rotate[dir].symbol
-      console.log(`(${s + 1}/${steps}) Standing on (${y}, ${x}) facing ${dir}`)
+      // console.log(`(${s + 1}/${steps}) Standing on (${y}, ${x}) facing ${dir}`)
 
       const [ny, nx] = nextPosition(map, dir, pos)
       const nextTile = map[ny][nx]
