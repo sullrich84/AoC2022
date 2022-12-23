@@ -7,26 +7,19 @@ console.log("🎄 Day X")
 
 const solve1 = ({ rawData }) => {
   const grid = rawData.map((row) => row.split(""))
-
-  const get = (y, x, def) => {
-    try {
-      return grid[y][x]
-    } catch {
-      return def
-    }
-  }
+  const field = (y, x, def) => (grid[y] ? grid[y][x] || def : def)
 
   const surr = (y, x) => ({
-    N: get(y - 1, x, "."),
-    NW: get(y - 1, x - 1, "."),
-    NE: get(y - 1, x + 1, "."),
+    N: field(y - 1, x, "."),
+    NW: field(y - 1, x - 1, "."),
+    NE: field(y - 1, x + 1, "."),
 
-    W: get(y, x - 1, "."),
-    E: get(y, x + 1, "."),
+    W: field(y, x - 1, "."),
+    E: field(y, x + 1, "."),
 
-    S: get(y + 1, x, "."),
-    SW: get(y + 1, x - 1, "."),
-    SE: get(y + 1, x + 1, "."),
+    S: field(y + 1, x, "."),
+    SW: field(y + 1, x - 1, "."),
+    SE: field(y + 1, x + 1, "."),
   })
 
   for (var round = 0; round < 10; round++) {
