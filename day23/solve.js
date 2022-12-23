@@ -57,14 +57,14 @@ const solve1 = ({ rawData }) => {
     console.log(`Round ${round + 1}`)
 
     // First half: move elfes
-    round1: for (const elf of elfs) {
+    round1A: for (const elf of elfs) {
       const adj = adjacent(elf.y, elf.x)
 
       // If no other Elves are in one of those eight positions,
       // the Elf does not do anything during this round.
       if (!adj.N && !adj.NE && !adj.NW && !adj.S && !adj.SE && !adj.SW && !adj.W && !adj.E) {
         elf.dest = null
-        continue round1
+        continue round1A
       }
 
       considerationLoop: for (const consider of elf.considerations) {
@@ -98,10 +98,12 @@ const solve1 = ({ rawData }) => {
       }
     }
 
-    console.log(preview(elfs).join("\n"))
+    round1B: for (const elf of elfs) {
+      const adj = adjacent(elf.y, elf.x)
+    }
 
-    // Second half: Move elfs
-    round2: for (const elf of elfs) {
+    // Second half: Cancel elfs with conflicting destinations
+    round2A: for (const elf of elfs) {
       // If two or more Elves propose moving to the same position, none of those Elves move.
       const conflicts = elfs.filter(({ id, dest }) => {
         elf.id !== id && dest && elf.dest && elf.dest.y === dest.y && elf.dest.x === dest.x
@@ -109,21 +111,24 @@ const solve1 = ({ rawData }) => {
 
       if (conflicts.length > 0) {
         for (const conflict of conflicts) {
-          updateConsiderations(conflict)
+          //updateConsiderations(conflict)
           conflict.dest = null
         }
-        updateConsiderations(elf)
+        //updateConsiderations(elf)
         elf.dest = null
       }
+    }
 
+    // Second half:Move elfs to their destinations and update considerations
+    round2B: for (const elf of elfs) {
       // Elf has been canceled due to a conflict
-      if (elf.dest === null) continue round2
+      if (elf.dest === null) continue round2B
 
       // Move elf and update considerations
       elf.y = elf.dest.y
       elf.x = elf.dest.x
 
-      updateConsiderations(elf)
+      //updateConsiderations(elf)
       elf.dest = null
     }
   }
