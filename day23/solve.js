@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day X")
+console.log("🎄 Day 23")
 
 /// Part 1
 
@@ -247,7 +247,7 @@ const solve2 = ({ rawData }) => {
     }
 
     const movingElfs = elfs.map(({ dest }) => (dest ? 1 : 0)).reduce((acc, val) => acc + val, 0)
-    if (movingElfs <= 0) break game
+    cif (movingElfs <= 0) break game
 
     if (round % 10 === 0) {
       console.log(round, movingElfs)
