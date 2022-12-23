@@ -6,34 +6,18 @@ console.log("🎄 Day 23")
 /// Part 1
 
 const solve1 = ({ rawData }) => {
-  const elfs = []
-
-  const preview = (grid) => {
-    const minY = _.min([...grid.map(({ y }) => y), 0])
-    const maxY = _.max([...grid.map(({ y }) => y), 11])
-    const minX = _.min([...grid.map(({ x }) => x), 0])
-    const maxX = _.max([...grid.map(({ x }) => x), 13])
-
-    return _.range(minY, maxY + 1).map((yy) => {
-      return _.range(minX, maxX + 1)
-        .map((xx) => {
-          return grid.find(({ y, x }) => yy === y && xx === x) ? "#" : "."
-        })
-        .join("")
-    })
-  }
+  const elves = []
 
   var id = 0
   rawData.forEach((row, y) =>
     row.split("").forEach((t, x) => {
       if (t === "#") {
-        elfs.push({ id: id++, x, y, dest: null, considerations: ["N", "S", "W", "E"] })
+        elves.push({ id: id++, x, y, dest: null })
       }
     }),
   )
 
-  // const field = (y, x, def) => (grid[y] ? grid[y][x] || def : def)
-  const get = (gy, gx) => elfs.find(({ y, x }) => gy === y && gx === x) || null
+  const get = (gy, gx) => elves.find(({ y, x }) => gy === y && gx === x) || null
 
   const adjacent = (y, x) => ({
     N: get(y - 1, x),
@@ -51,8 +35,8 @@ const solve1 = ({ rawData }) => {
   var considerations = ["N", "S", "W", "E"]
 
   for (var round = 0; round < 10; round++) {
-    // First half: move elfes
-    round1A: for (const elf of elfs) {
+    // First half: move elves
+    round1A: for (const elf of elves) {
       const adj = adjacent(elf.y, elf.x)
 
       // If no other Elves are in one of those eight positions,
@@ -93,10 +77,10 @@ const solve1 = ({ rawData }) => {
       }
     }
 
-    // Second half: Cancel elfs with conflicting destinations
-    round2A: for (const elf of elfs) {
-      // If two or more Elves propose moving to the same position, none of those Elves move.
-      const conflicts = elfs.filter(({ id, dest }) => {
+    // If two or more Elves propose moving to the
+    // same position, none of those Elves move.
+    round2A: for (const elf of elves) {
+      const conflicts = elves.filter(({ id, dest }) => {
         return elf.id !== id && dest && elf.dest && elf.dest.y === dest.y && elf.dest.x === dest.x
       })
 
@@ -108,9 +92,8 @@ const solve1 = ({ rawData }) => {
       }
     }
 
-    // Second half:Move elfs to their destinations
-    round2B: for (const elf of elfs) {
-      // Elf has been canceled due to a conflict
+    // Move elves without conflicts
+    round2B: for (const elf of elves) {
       if (elf.dest === null) continue round2B
 
       // Move elf
@@ -124,53 +107,37 @@ const solve1 = ({ rawData }) => {
     considerations = [...considerations, shift]
   }
 
-  const minY = _.min([...elfs.map(({ y }) => y)])
-  const maxY = _.max([...elfs.map(({ y }) => y)])
-  const minX = _.min([...elfs.map(({ x }) => x)])
-  const maxX = _.max([...elfs.map(({ x }) => x)])
+  const minY = _.min([...elves.map(({ y }) => y)])
+  const maxY = _.max([...elves.map(({ y }) => y)])
+  const minX = _.min([...elves.map(({ x }) => x)])
+  const maxX = _.max([...elves.map(({ x }) => x)])
 
   const h = Math.abs(minY - maxY) + 1
   const w = Math.abs(minX - maxX) + 1
 
-  return h * w - elfs.length
+  return h * w - elves.length
 }
 
-// const sRes1 = [{ rawData: sample }].map(solve1)
-// const res1 = [{ rawData: data }].map(solve1)
+const sRes1 = [{ rawData: sample }].map(solve1)
+const res1 = [{ rawData: data }].map(solve1)
 
-// console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", sRes1, "Task:", res1)
 
 /// Part 2
 
 const solve2 = ({ rawData }) => {
-  const elfs = []
-
-  const preview = (grid) => {
-    const minY = _.min([...grid.map(({ y }) => y), 0])
-    const maxY = _.max([...grid.map(({ y }) => y), 11])
-    const minX = _.min([...grid.map(({ x }) => x), 0])
-    const maxX = _.max([...grid.map(({ x }) => x), 13])
-
-    return _.range(minY, maxY + 1).map((yy) => {
-      return _.range(minX, maxX + 1)
-        .map((xx) => {
-          return grid.find(({ y, x }) => yy === y && xx === x) ? "#" : "."
-        })
-        .join("")
-    })
-  }
+  const elves = []
 
   var id = 0
   rawData.forEach((row, y) =>
     row.split("").forEach((t, x) => {
       if (t === "#") {
-        elfs.push({ id: id++, x, y, dest: null, considerations: ["N", "S", "W", "E"] })
+        elves.push({ id: id++, x, y, dest: null })
       }
     }),
   )
 
-  // const field = (y, x, def) => (grid[y] ? grid[y][x] || def : def)
-  const get = (gy, gx) => elfs.find(({ y, x }) => gy === y && gx === x) || null
+  const get = (gy, gx) => elves.find(({ y, x }) => gy === y && gx === x) || null
 
   const adjacent = (y, x) => ({
     N: get(y - 1, x),
@@ -189,8 +156,8 @@ const solve2 = ({ rawData }) => {
 
   var round = 1
   game: while (true) {
-    // First half: move elfes
-    round1A: for (const elf of elfs) {
+    // First half: move elves
+    round1A: for (const elf of elves) {
       const adj = adjacent(elf.y, elf.x)
 
       // If no other Elves are in one of those eight positions,
@@ -231,10 +198,10 @@ const solve2 = ({ rawData }) => {
       }
     }
 
-    // Second half: Cancel elfs with conflicting destinations
-    round2A: for (const elf of elfs) {
+    // Second half: Cancel elves with conflicting destinations
+    round2A: for (const elf of elves) {
       // If two or more Elves propose moving to the same position, none of those Elves move.
-      const conflicts = elfs.filter(({ id, dest }) => {
+      const conflicts = elves.filter(({ id, dest }) => {
         return elf.id !== id && dest && elf.dest && elf.dest.y === dest.y && elf.dest.x === dest.x
       })
 
@@ -246,11 +213,11 @@ const solve2 = ({ rawData }) => {
       }
     }
 
-    const hasMovingElf = elfs.find(({ dest }) => (dest ? 1 : 0))
+    const hasMovingElf = elves.find(({ dest }) => (dest ? 1 : 0))
     if (!hasMovingElf) break game
 
-    // Second half:Move elfs to their destinations
-    round2B: for (const elf of elfs) {
+    // Second half: Move elves to their destinations
+    round2B: for (const elf of elves) {
       // Elf has been canceled due to a conflict
       if (elf.dest === null) continue round2B
 
@@ -269,6 +236,7 @@ const solve2 = ({ rawData }) => {
   return round
 }
 
+// This may run for about 5 minutes :)
 const sRes2 = [{ rawData: sample }].map(solve2)
 const res2 = [{ rawData: data }].map(solve2)
 
