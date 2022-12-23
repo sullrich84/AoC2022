@@ -53,9 +53,9 @@ const solve1 = ({ rawData }) => {
     elf.considerations.push(elf.dest.move)
   }
 
-  for (var round = 0; round < 10; round++) {
-    console.log(`Round ${round + 1}`)
+  var considerations = ["N", "S", "W", "E"]
 
+  for (var round = 0; round < 10; round++) {
     // First half: move elfes
     round1A: for (const elf of elfs) {
       const adj = adjacent(elf.y, elf.x)
@@ -67,7 +67,7 @@ const solve1 = ({ rawData }) => {
         continue round1A
       }
 
-      considerationLoop: for (const consider of elf.considerations) {
+      considerationLoop: for (const consider of considerations) {
         // If there is no Elf in the N, NE, or NW adjacent positions,
         // the Elf proposes moving north one step.
         if (consider === "N" && !adj.N && !adj.NE && !adj.NW) {
@@ -98,46 +98,50 @@ const solve1 = ({ rawData }) => {
       }
     }
 
-    round1B: for (const elf of elfs) {
-      const adj = adjacent(elf.y, elf.x)
-    }
-
     // Second half: Cancel elfs with conflicting destinations
     round2A: for (const elf of elfs) {
       // If two or more Elves propose moving to the same position, none of those Elves move.
       const conflicts = elfs.filter(({ id, dest }) => {
-        elf.id !== id && dest && elf.dest && elf.dest.y === dest.y && elf.dest.x === dest.x
+        return elf.id !== id && dest && elf.dest && elf.dest.y === dest.y && elf.dest.x === dest.x
       })
 
       if (conflicts.length > 0) {
         for (const conflict of conflicts) {
-          //updateConsiderations(conflict)
           conflict.dest = null
         }
-        //updateConsiderations(elf)
         elf.dest = null
       }
     }
 
-    // Second half:Move elfs to their destinations and update considerations
+    // Second half:Move elfs to their destinations
     round2B: for (const elf of elfs) {
       // Elf has been canceled due to a conflict
       if (elf.dest === null) continue round2B
 
-      // Move elf and update considerations
+      // Move elf
       elf.y = elf.dest.y
       elf.x = elf.dest.x
-
-      //updateConsiderations(elf)
       elf.dest = null
     }
+
+    // Update considerations
+    const shift = considerations.shift()
+    considerations = [...considerations, shift]
   }
 
-  return 0
+  const minY = _.min([...elfs.map(({ y }) => y)])
+  const maxY = _.max([...elfs.map(({ y }) => y)])
+  const minX = _.min([...elfs.map(({ x }) => x)])
+  const maxX = _.max([...elfs.map(({ x }) => x)])
+
+  const h = Math.abs(minY - maxY) + 1
+  const w = Math.abs(minX - maxX) + 1
+
+  return h * w - elfs.length
 }
 
 const sRes1 = [{ rawData: sample }].map(solve1)
-const res1 = 0 //[{ data: data }].map(solve1)
+const res1 = [{ rawData: data }].map(solve1)
 
 console.log("Sample:", sRes1, "Task:", res1)
 
