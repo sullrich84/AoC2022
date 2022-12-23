@@ -17,16 +17,16 @@ const solve1 = ({ rawData }) => {
   }
 
   const surr = (y, x) => ({
-    N: grid[y - 1][x] || ".",
-    NW: grid[y - 1][x - 1] || ".",
-    NE: grid[y - 1][x + 1] || ".",
+    N: get(y - 1, x, "."),
+    NW: get(y - 1, x - 1, "."),
+    NE: get(y - 1, x + 1, "."),
 
-    W: grid[y][x - 1] || ".",
-    E: grid[y][x + 1] || ".",
+    W: get(y, x - 1, "."),
+    E: get(y, x + 1, "."),
 
-    S: grid[y + 1][x] || ".",
-    SW: grid[y + 1][x - 1] || ".",
-    SE: grid[y + 1][x + 1] || ".",
+    S: get(y + 1, x, "."),
+    SW: get(y + 1, x - 1, "."),
+    SE: get(y + 1, x + 1, "."),
   })
 
   for (var round = 0; round < 10; round++) {
