@@ -118,10 +118,8 @@ const solve1 = ({ rawData }) => {
   return h * w - elves.length
 }
 
-const sRes1 = [{ rawData: sample }].map(solve1)
-const res1 = [{ rawData: data }].map(solve1)
-
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", [{ rawData: sample }].map(solve1))
+console.log("Task:", [{ rawData: data }].map(solve1))
 
 /// Part 2
 
@@ -237,7 +235,5 @@ const solve2 = ({ rawData }) => {
 }
 
 // This may run for about 5 minutes :)
-const sRes2 = [{ rawData: sample }].map(solve2)
-const res2 = [{ rawData: data }].map(solve2)
-
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", [{ rawData: sample }].map(solve2))
+console.log("Task:", [{ rawData: data }].map(solve2))
