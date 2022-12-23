@@ -24,10 +24,8 @@ const solve1 = ({ data }) => {
   return calc(root)
 }
 
-// const sRes1 = [{ data: sample }].map(solve1)
-// const res1 = [{ data: data }].map(solve1)
-
-// console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
@@ -37,23 +35,6 @@ const solve2 = ({ data }) => {
     if (e.id === "humn") return { ...e, val: undefined }
     return e
   })
-
-  // const treeRev = tree.map((e) => {
-  //   if (!e.deps) return e
-  //   var vals = e.val.split(" ")
-  //   switch (vals[1]) {
-  //     case "+":
-  //       return { ...e, val: vals[0] + " - " + vals[2] }
-  //     case "-":
-  //       return { ...e, val: vals[0] + " + " + vals[2] }
-  //     case "*":
-  //       return { ...e, val: vals[0] + " / " + vals[2] }
-  //     case "/":
-  //       return { ...e, val: vals[0] + " * " + vals[2] }
-  //     default:
-  //       return e
-  //   }
-  // })
 
   const root = tree.find(({ id }) => id === "root")
   const humn = tree.find(({ id }) => id === "humn")
@@ -91,8 +72,6 @@ const solve2 = ({ data }) => {
     const rres2 = calc(rn2, x)
 
     const diff = rres1 - rres2
-    console.log(x, diff)
-
     if (diff === 0) break
 
     if (diff < 0) {
@@ -109,7 +88,5 @@ const solve2 = ({ data }) => {
   return x
 }
 
-const sRes2 = [{ data: data }].map(solve2)
-const res2 = 0 //[{ data: data }].map(solve2)
-
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", [{ data: data }].map(solve2))
+console.log("Task:", [{ data: data }].map(solve2))
