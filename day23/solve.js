@@ -246,12 +246,8 @@ const solve2 = ({ rawData }) => {
       }
     }
 
-    const movingElfs = elfs.map(({ dest }) => (dest ? 1 : 0)).reduce((acc, val) => acc + val, 0)
-    if (movingElfs <= 0) break game
-
-    if (round % 10 === 0) {
-      console.log(round, movingElfs)
-    }
+    const hasMovingElf = elfs.find(({ dest }) => (dest ? 1 : 0))
+    if (!hasMovingElf) break game
 
     // Second half:Move elfs to their destinations
     round2B: for (const elf of elfs) {
