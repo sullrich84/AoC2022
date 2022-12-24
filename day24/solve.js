@@ -95,74 +95,109 @@ const solve1 = ({ data }) => {
   const start = [2, 4]
   const end = [grid.length - 1, grid[0].length - 2]
 
-  const seen = {}
   const stack = []
-  var minSteps = null
+  const seen = {}
 
-  stack.push([[2, 4], initialBlizzards, 0])
+  var minSteps = Number.POSITIVE_INFINITY
+  var maxSteps = 310
+  stack.push([[0, 1], initialBlizzards, 0])
 
   while (stack.length > 0) {
     const [player, blizzards, steps] = stack.pop()
+    const [py, px] = [...player]
 
-    if (stack.length > 1000000) {
-      minSteps = "Overshoot"
-      break
+    const distance = Math.abs(py - end[0]) + Math.abs(px - end[1])
+
+    if (steps + distance >= minSteps) {
+      // console.log("Inefficient")
+      continue
     }
 
-    if (minSteps != null && steps >= minSteps) continue
+    if (steps + distance >= maxSteps) {
+      // console.log("Out of reach")
+      continue
+    }
+
+    if (distance == 0) {
+      minSteps = Math.min(minSteps, steps)
+      console.log("Min:", minSteps)
+      continue
+    }
+
+    // console.log(steps + distance)
 
     const bKey = _.uniq(blizzards.map(([y, x]) => y + ":" + x)).join()
     const key = [steps, player.join(":"), bKey].join("/")
-    if (key in seen) continue
+    if (key in seen) {
+      // console.log("Allready seen")
+      continue
+    }
     seen[key] = true
-
-    const [py, px] = [...player]
 
     // Dead end
     if (blizzards.find(([y, x]) => y == py && px == x)) {
       continue
     }
 
-    // Target reached
-    if (py == end[0] && py == end[1]) {
-      minSteps = Math.min(minSteps, steps)
-      continue
-    }
-
-    // Draws the current snapshot of the game state
-    // const map = buildMap(grid, player, blizzards)
+    // Target reached (duplicate to dist)
+    // if (py == end[0] && px == end[1]) {
+    //   minSteps = Math.min(minSteps, steps)
+    //   continue
+    // }
 
     // Update blizzard the movements for next cycle
     const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, end))
 
-    // Wait one turn
-    stack.push([player, movedBlizzards, steps])
+    // Draws the current snapshot of the game state
+    // const map = buildMap(grid, player, movedBlizzards)
+
+    const nextStacks = []
 
     // Can player move down?
     if (py < end[0] - 1 || px == end[1]) {
-      stack.push([[py + 1, px], movedBlizzards, steps + 1])
+      const blizz = movedBlizzards.find(([y, x]) => py + 1 == y && px == x) != undefined
+      if (!blizz) nextStacks.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
     if (py > 1 || (py > 0 && px == start[1])) {
-      stack.push([[py - 1, px], movedBlizzards, steps + 1])
+      const blizz = movedBlizzards.find(([y, x]) => py - 1 == y && px == x) != undefined
+      if (!blizz) nextStacks.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move right?
     if (px < end[1] && py > 0) {
-      stack.push([[py, px + 1], movedBlizzards, steps + 1])
+      const blizz = movedBlizzards.find(([y, x]) => py == y && px + 1 == x) != undefined
+      if (!blizz) nextStacks.push([[py, px + 1], movedBlizzards, steps + 1])
     }
 
     // Can player move left?
     if (px > 1 && py > 0) {
-      stack.push([[py, px - 1], movedBlizzards, steps + 1])
+      const blizz = movedBlizzards.find(([y, x]) => py == y && px - 1 == x) != undefined
+      if (!blizz) nextStacks.push([[py, px - 1], movedBlizzards, steps + 1])
     }
+
+    // if (nextStacks.length == 0) {
+    // We wait since we would die if we move in any direction
+    nextStacks.push([[py, px], movedBlizzards, steps + 1])
+    // }
+
+    // Sort the next stack to push the closest remaining distance first
+    nextStacks.sort((a, b) => {
+      const distA = Math.abs(a[0][0] - end[0]) + Math.abs(a[0][1] - end[1])
+      const distB = Math.abs(b[0][0] - end[0]) + Math.abs(b[0][1] - end[1])
+      return distB - distA
+    })
+
+    stack.push(...nextStacks)
   }
 
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
+// <= 353
+
+console.log("Sample:", [{ data: data }].map(solve1))
 // console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
