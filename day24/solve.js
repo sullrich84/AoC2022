@@ -85,7 +85,7 @@ const solve1 = ({ data }) => {
   const seen = {}
 
   var minSteps = Number.POSITIVE_INFINITY
-  var maxSteps = 310
+  var maxSteps = 330
 
   stack.push([[0, 1], initialBlizzards, 0])
 
@@ -162,8 +162,11 @@ const solve2 = ({ data }) => {
     [0, 1],
     [grid.length - 1, grid[0].length - 2],
   ]
-  var minSteps = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]
-  var maxSteps = 330
+
+  var minSteps = Number.POSITIVE_INFINITY
+  var maxSteps = 900
+
+  const minDist = Math.abs(start[0] - finish[0]) + Math.abs(start[1] - finish[1])
 
   stack.push([[0, 1], initialBlizzards, 0, 0, destination[0]])
 
@@ -171,29 +174,32 @@ const solve2 = ({ data }) => {
     const [player, blizzards, steps, cycle] = stack.pop()
     const [py, px] = [...player]
 
-    const distance = Math.abs(py - destination[cycle][0]) + Math.abs(px - destination[cycle][1])
+    var cycleOffset = 0
+    if (cycle === 0) cycleOffset = 2 * minDist
+    if (cycle === 1) cycleOffset = minDist
 
-    console.log(cycle, distance, py, px)
+    const distance = Math.abs(py - destination[cycle][0]) + Math.abs(px - destination[cycle][1])
 
     const key = [steps, py, px, cycle].join(":")
     if (key in seen) continue
     seen[key] = true
 
     // Dead end
-    if (steps + distance >= minSteps[cycle] || steps + distance >= maxSteps) continue
+    if (steps + distance + cycleOffset >= minSteps || steps + distance + cycleOffset >= maxSteps) continue
     if (blizzards.find(([y, x]) => y == py && px == x)) continue
 
     // Update blizzard the movements for next cycle
     const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, finish))
 
     if (distance == 0) {
-      minSteps[cycle] = Math.min(minSteps[cycle], steps)
-      if (minSteps[cycle] != steps) {
-        console.log("Min:", cycle, minSteps[cycle])
+      if (cycle == 0) {
+        stack.push([[py, px], movedBlizzards, steps + 1, 1, destination[1]])
       }
-
-      if (cycle < 2) {
-        stack.push([[py, px], movedBlizzards, 0, cycle + 1, destination[cycle + 1]])
+      if (cycle == 1) {
+        stack.push([[py, px], movedBlizzards, steps + 1, 2, destination[2]])
+      }
+      if (cycle == 2) {
+        minSteps = Math.min(minSteps, steps)
       }
 
       continue
@@ -203,22 +209,22 @@ const solve2 = ({ data }) => {
     const map = buildMap(grid, player, movedBlizzards)
 
     // Can player move down?
-    if (py < finish[0] - 1 || px == finish[1]) {
+    if (py + 1 < map.length && map[py + 1][px] === ".") {
       stack.push([[py + 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move up?
-    if (py > 1 || (py > 0 && px == start[1])) {
+    if (py - 1 >= 0 && map[py - 1][px] === ".") {
       stack.push([[py - 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move right?
-    if (px < finish[1] && py > 0) {
+    if (px + 1 < map[0].length && map[py][px + 1] === ".") {
       stack.push([[py, px + 1], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move left?
-    if (px > 1 && py > 0) {
+    if (px - 1 >= 0 && map[py][px - 1] === ".") {
       stack.push([[py, px - 1], movedBlizzards, steps + 1, cycle])
     }
 
@@ -230,4 +236,4 @@ const solve2 = ({ data }) => {
 }
 
 // console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve2))
+console.log("Task:", [{ data: data }].map(solve2))
