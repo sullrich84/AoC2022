@@ -142,7 +142,7 @@ const solve1 = ({ data }) => {
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
+// console.log("Sample:", [{ data: sample }].map(solve1))
 // console.log("Task:", [{ da/ta: data }].map(solve1))
 
 /// Part 2
@@ -151,16 +151,14 @@ const solve2 = ({ data }) => {
   const initialBlizzards = parseBlizzards(data)
   const grid = parseGrid(data)
 
-  const start = [grid.length - 1, grid[0].length - 2]
-  const finish = [0, 1]
+  const start = [0, 1]
+  const finish = [grid.length - 1, grid[0].length - 2]
 
   const stack = []
   const seen = {}
 
-  const nextDest = [finish, start, finish]
-
   var minSteps = Number.POSITIVE_INFINITY
-  var maxSteps = 900
+  var maxSteps = 310
 
   stack.push([[0, 1], initialBlizzards, 0])
 
@@ -191,12 +189,12 @@ const solve2 = ({ data }) => {
     // const map = buildMap(grid, player, movedBlizzards)
 
     // Can player move down?
-    if (py < finish[0] - 1 || (py == start[0] && px == start[1]) || (py == finish[0] && px == finish[1] - 1)) {
+    if (py < finish[0] - 1 || px == finish[1]) {
       stack.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
-    if (py > 1 || (py == start[0] + 1 && px == start[1]) || (py == finish[0] && px == finish[1])) {
+    if (py > 1 || (py > 0 && px == start[1])) {
       stack.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
@@ -217,5 +215,5 @@ const solve2 = ({ data }) => {
   return minSteps
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve2))
+console.log("Sample:", [{ data: sample }].map(solve2))
 // console.log("Task:", [{ data: data }].map(solve2))
