@@ -113,25 +113,25 @@ const solve1 = ({ data }) => {
     const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, finish))
 
     // Draws the current snapshot of the game state
-    // const map = buildMap(grid, player, movedBlizzards)
+    const map = buildMap(grid, player, movedBlizzards)
 
     // Can player move down?
-    if (py < finish[0] - 1 || px == finish[1]) {
+    if (py + 1 < map.length && map[py + 1][px] === ".") {
       stack.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
-    if (py > 1 || (py > 0 && px == start[1])) {
+    if (py - 1 >= 0 && map[py - 1][px] === ".") {
       stack.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move right?
-    if (px < finish[1] && py > 0) {
+    if (px + 1 < map[0].length && map[py][px + 1] === ".") {
       stack.push([[py, px + 1], movedBlizzards, steps + 1])
     }
 
     // Can player move left?
-    if (px > 1 && py > 0) {
+    if (px - 1 >= 0 && map[py][px - 1] === ".") {
       stack.push([[py, px - 1], movedBlizzards, steps + 1])
     }
 
@@ -143,7 +143,7 @@ const solve1 = ({ data }) => {
 }
 
 // console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ da/ta: data }].map(solve1))
+// console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
@@ -157,16 +157,23 @@ const solve2 = ({ data }) => {
   const stack = []
   const seen = {}
 
+  const destination = [
+    [grid.length - 1, grid[0].length - 2],
+    [0, 1],
+    [grid.length - 1, grid[0].length - 2],
+  ]
   var minSteps = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]
   var maxSteps = 330
 
-  stack.push([[0, 1], initialBlizzards, 0, 0, [grid.length - 1, grid[0].length - 2]])
+  stack.push([[0, 1], initialBlizzards, 0, 0, destination[0]])
 
   while (stack.length > 0) {
-    const [player, blizzards, steps, cycle, dest] = stack.pop()
+    const [player, blizzards, steps, cycle] = stack.pop()
     const [py, px] = [...player]
 
-    const distance = Math.abs(py - dest[0]) + Math.abs(px - dest[1])
+    const distance = Math.abs(py - destination[cycle][0]) + Math.abs(px - destination[cycle][1])
+
+    console.log(cycle, distance, py, px)
 
     const key = [steps, py, px, cycle].join(":")
     if (key in seen) continue
@@ -181,44 +188,46 @@ const solve2 = ({ data }) => {
 
     if (distance == 0) {
       minSteps[cycle] = Math.min(minSteps[cycle], steps)
-      console.log("Min:", cycle, minSteps[cycle])
+      if (minSteps[cycle] != steps) {
+        console.log("Min:", cycle, minSteps[cycle])
+      }
 
       if (cycle < 2) {
-        stack.push([[py, px], movedBlizzards, steps, cycle + 1, dest])
+        stack.push([[py, px], movedBlizzards, 0, cycle + 1, destination[cycle + 1]])
       }
 
       continue
     }
 
     // Draws the current snapshot of the game state
-    // const map = buildMap(grid, player, movedBlizzards)
+    const map = buildMap(grid, player, movedBlizzards)
 
     // Can player move down?
     if (py < finish[0] - 1 || px == finish[1]) {
-      stack.push([[py + 1, px], movedBlizzards, steps + 1, cycle, dest])
+      stack.push([[py + 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move up?
     if (py > 1 || (py > 0 && px == start[1])) {
-      stack.push([[py - 1, px], movedBlizzards, steps + 1, cycle, dest])
+      stack.push([[py - 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move right?
     if (px < finish[1] && py > 0) {
-      stack.push([[py, px + 1], movedBlizzards, steps + 1, cycle, dest])
+      stack.push([[py, px + 1], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move left?
     if (px > 1 && py > 0) {
-      stack.push([[py, px - 1], movedBlizzards, steps + 1, cycle, dest])
+      stack.push([[py, px - 1], movedBlizzards, steps + 1, cycle])
     }
 
     // Wait for one round
-    stack.push([[py, px], movedBlizzards, steps + 1, cycle, dest])
+    stack.push([[py, px], movedBlizzards, steps + 1, cycle])
   }
 
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve2))
+// console.log("Sample:", [{ data: sample }].map(solve2))
 // console.log("Task:", [{ data: data }].map(solve2))
