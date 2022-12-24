@@ -92,69 +92,74 @@ const solve1 = ({ data }) => {
   const initialBlizzards = parseBlizzards(data)
   const grid = parseGrid(data)
 
-  const start = [0, 1]
+  const start = [2, 4]
   const end = [grid.length - 1, grid[0].length - 2]
 
   const seen = {}
   const stack = []
-  const needed = []
+  var minSteps = null
 
-  stack.push([[3, 3], initialBlizzards, 0])
+  stack.push([[2, 4], initialBlizzards, 0])
 
   while (stack.length > 0) {
-    const [player, blizzards, minute] = stack.pop()
+    const [player, blizzards, steps] = stack.pop()
 
-    const key = [minute, player.join(":"), blizzards.map((b) => b.join(":")).join()].join("/")
+    if (stack.length > 1000000) {
+      minSteps = "Overshoot"
+      break
+    }
+
+    if (minSteps != null && steps >= minSteps) continue
+
+    const bKey = _.uniq(blizzards.map(([y, x]) => y + ":" + x)).join()
+    const key = [steps, player.join(":"), bKey].join("/")
     if (key in seen) continue
     seen[key] = true
 
     const [py, px] = [...player]
 
     // Dead end
-    // if (blizzards.find(([y, x]) => y == py && px == x)) {
-    //   continue
-    // }
-
-    // Target reached
-    if (py == end[0] && py == end[1]) {
-      needed.push(minute)
+    if (blizzards.find(([y, x]) => y == py && px == x)) {
       continue
     }
 
-    // // Draws the current snapshot of the game state
-    const map = buildMap(grid, player, blizzards)
+    // Target reached
+    if (py == end[0] && py == end[1]) {
+      minSteps = Math.min(minSteps, steps)
+      continue
+    }
+
+    // Draws the current snapshot of the game state
+    // const map = buildMap(grid, player, blizzards)
 
     // Update blizzard the movements for next cycle
     const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, end))
 
+    // Wait one turn
+    stack.push([player, movedBlizzards, steps])
+
     // Can player move down?
     if (py < end[0] - 1 || px == end[1]) {
-      console.log("down")
-      // stack.push([[py + 1, px], movedBlizzards, minute + 1])
+      stack.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
     if (py > 1 || (py > 0 && px == start[1])) {
-      console.log("up")
-      // stack.push([[py - 1, px], movedBlizzards, minute + 1])
-    }
-
-    // Can player move left?
-    if (px > 1 && py > 0) {
-      console.log("left")
-      // stack.push([[py, px - 1], movedBlizzards, minute + 1])
+      stack.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move right?
     if (px < end[1] && py > 0) {
-      console.log("right")
-      // stack.push([[py, px + 1], movedBlizzards, minute + 1])
+      stack.push([[py, px + 1], movedBlizzards, steps + 1])
     }
 
-    stack.push([player, blizzards, minute + 1])
+    // Can player move left?
+    if (px > 1 && py > 0) {
+      stack.push([[py, px - 1], movedBlizzards, steps + 1])
+    }
   }
 
-  return 0
+  return minSteps
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
