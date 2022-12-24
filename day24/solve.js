@@ -157,29 +157,29 @@ const solve2 = ({ data }) => {
   const stack = []
   const seen = {}
 
-  var minSteps = Number.POSITIVE_INFINITY
-  var maxSteps = 310
+  var minSteps = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]
+  var maxSteps = 330
 
-  stack.push([[0, 1], initialBlizzards, 0])
+  stack.push([[0, 1], initialBlizzards, 0, 0])
 
   while (stack.length > 0) {
-    const [player, blizzards, steps] = stack.pop()
+    const [player, blizzards, steps, cycle] = stack.pop()
     const [py, px] = [...player]
 
     const distance = Math.abs(py - finish[0]) + Math.abs(px - finish[1])
 
     if (distance == 0) {
-      minSteps = Math.min(minSteps, steps)
-      console.log("Min:", minSteps)
+      minSteps[cycle] = Math.min(minSteps[cycle], steps)
+      console.log("Min:", minSteps[cycle])
       continue
     }
 
-    const key = [steps, py, px].join(":")
+    const key = [steps, py, px, cycle].join(":")
     if (key in seen) continue
     seen[key] = true
 
     // Dead end
-    if (steps + distance >= minSteps || steps + distance >= maxSteps) continue
+    if (steps + distance >= minSteps[cycle] || steps + distance >= maxSteps) continue
     if (blizzards.find(([y, x]) => y == py && px == x)) continue
 
     // Update blizzard the movements for next cycle
@@ -190,26 +190,26 @@ const solve2 = ({ data }) => {
 
     // Can player move down?
     if (py < finish[0] - 1 || px == finish[1]) {
-      stack.push([[py + 1, px], movedBlizzards, steps + 1])
+      stack.push([[py + 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move up?
     if (py > 1 || (py > 0 && px == start[1])) {
-      stack.push([[py - 1, px], movedBlizzards, steps + 1])
+      stack.push([[py - 1, px], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move right?
     if (px < finish[1] && py > 0) {
-      stack.push([[py, px + 1], movedBlizzards, steps + 1])
+      stack.push([[py, px + 1], movedBlizzards, steps + 1, cycle])
     }
 
     // Can player move left?
     if (px > 1 && py > 0) {
-      stack.push([[py, px - 1], movedBlizzards, steps + 1])
+      stack.push([[py, px - 1], movedBlizzards, steps + 1, cycle])
     }
 
     // Wait for one round
-    stack.push([[py, px], movedBlizzards, steps + 1])
+    stack.push([[py, px], movedBlizzards, steps + 1, cycle])
   }
 
   return minSteps
