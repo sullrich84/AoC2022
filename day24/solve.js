@@ -39,36 +39,22 @@ const moveBlizzard = ([y, x, dir], [sy, sx], [ey, ex]) => {
   switch (dir) {
     case "^":
       var yy = y - 1
-      // if ((x != sx && yy < 1) || (x == sx && yy < 0)) {
-      if (yy < 1) {
-        // Warp to end
-        yy = ey - 1
-      }
+      if (yy < 1) yy = ey - 1
       return [yy, x, dir]
 
     case "v":
       var yy = y + 1
-      // if ((x != ex && yy >= ey) || (x == ex && yy >= ey + 1)) {
-      if (yy >= ey) {
-        // Warp to start
-        yy = 1
-      }
+      if (yy >= ey) yy = 1
       return [yy, x, dir]
 
     case "<":
       var xx = x - 1
-      if (xx < 1) {
-        // Warp to end
-        xx = ex
-      }
+      if (xx < 1) xx = ex
       return [y, xx, dir]
 
     case ">":
       var xx = x + 1
-      if (xx > ex) {
-        // Warp to start
-        xx = 1
-      }
+      if (xx > ex) xx = 1
       return [y, xx, dir]
   }
 }
@@ -92,31 +78,22 @@ const solve1 = ({ data }) => {
   const initialBlizzards = parseBlizzards(data)
   const grid = parseGrid(data)
 
-  const start = [2, 4]
-  const end = [grid.length - 1, grid[0].length - 2]
+  const start = [0, 1]
+  const dest = [grid.length - 1, grid[0].length - 2]
 
   const stack = []
   const seen = {}
 
   var minSteps = Number.POSITIVE_INFINITY
   var maxSteps = 310
+
   stack.push([[0, 1], initialBlizzards, 0])
 
   while (stack.length > 0) {
     const [player, blizzards, steps] = stack.pop()
     const [py, px] = [...player]
 
-    const distance = Math.abs(py - end[0]) + Math.abs(px - end[1])
-
-    if (steps + distance >= minSteps) {
-      // console.log("Inefficient")
-      continue
-    }
-
-    if (steps + distance >= maxSteps) {
-      // console.log("Out of reach")
-      continue
-    }
+    const distance = Math.abs(py - dest[0]) + Math.abs(px - dest[1])
 
     if (distance == 0) {
       minSteps = Math.min(minSteps, steps)
@@ -124,87 +101,118 @@ const solve1 = ({ data }) => {
       continue
     }
 
-    // console.log(steps + distance)
-
-    const bKey = _.uniq(blizzards.map(([y, x]) => y + ":" + x)).join()
-    const key = [steps, player.join(":"), bKey].join("/")
-    if (key in seen) {
-      // console.log("Allready seen")
-      continue
-    }
+    const key = [steps, py, px].join(":")
+    if (key in seen) continue
     seen[key] = true
 
     // Dead end
-    if (blizzards.find(([y, x]) => y == py && px == x)) {
-      continue
-    }
-
-    // Target reached (duplicate to dist)
-    // if (py == end[0] && px == end[1]) {
-    //   minSteps = Math.min(minSteps, steps)
-    //   continue
-    // }
+    if (steps + distance >= minSteps || steps + distance >= maxSteps) continue
+    if (blizzards.find(([y, x]) => y == py && px == x)) continue
 
     // Update blizzard the movements for next cycle
-    const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, end))
+    const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, dest))
 
     // Draws the current snapshot of the game state
     // const map = buildMap(grid, player, movedBlizzards)
 
-    const nextStacks = []
-
     // Can player move down?
-    if (py < end[0] - 1 || px == end[1]) {
-      const blizz = movedBlizzards.find(([y, x]) => py + 1 == y && px == x) != undefined
-      if (!blizz) nextStacks.push([[py + 1, px], movedBlizzards, steps + 1])
+    if (py < dest[0] - 1 || px == dest[1]) {
+      stack.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
     if (py > 1 || (py > 0 && px == start[1])) {
-      const blizz = movedBlizzards.find(([y, x]) => py - 1 == y && px == x) != undefined
-      if (!blizz) nextStacks.push([[py - 1, px], movedBlizzards, steps + 1])
+      stack.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move right?
-    if (px < end[1] && py > 0) {
-      const blizz = movedBlizzards.find(([y, x]) => py == y && px + 1 == x) != undefined
-      if (!blizz) nextStacks.push([[py, px + 1], movedBlizzards, steps + 1])
+    if (px < dest[1] && py > 0) {
+      stack.push([[py, px + 1], movedBlizzards, steps + 1])
     }
 
     // Can player move left?
     if (px > 1 && py > 0) {
-      const blizz = movedBlizzards.find(([y, x]) => py == y && px - 1 == x) != undefined
-      if (!blizz) nextStacks.push([[py, px - 1], movedBlizzards, steps + 1])
+      stack.push([[py, px - 1], movedBlizzards, steps + 1])
     }
 
-    // if (nextStacks.length == 0) {
-    // We wait since we would die if we move in any direction
-    nextStacks.push([[py, px], movedBlizzards, steps + 1])
-    // }
-
-    // Sort the next stack to push the closest remaining distance first
-    nextStacks.sort((a, b) => {
-      const distA = Math.abs(a[0][0] - end[0]) + Math.abs(a[0][1] - end[1])
-      const distB = Math.abs(b[0][0] - end[0]) + Math.abs(b[0][1] - end[1])
-      return distB - distA
-    })
-
-    stack.push(...nextStacks)
+    // Wait for one round
+    stack.push([[py, px], movedBlizzards, steps + 1])
   }
 
   return minSteps
 }
 
-// <= 353
-
-console.log("Sample:", [{ data: data }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
-const solve2 = (input) => {
-  console.log(input)
-  return 0
+const solve2 = ({ data }) => {
+  const initialBlizzards = parseBlizzards(data)
+  const grid = parseGrid(data)
+
+  const start = [0, 1]
+  const dest = [grid.length - 1, grid[0].length - 2]
+
+  const stack = []
+  const seen = {}
+
+  var minSteps = Number.POSITIVE_INFINITY
+  var maxSteps = 500
+
+  stack.push([[0, 1], dest, initialBlizzards, 0])
+
+  while (stack.length > 0) {
+    const [player, destination, blizzards, steps] = stack.pop()
+    const [py, px] = [...player]
+
+    const distance = Math.abs(py - dest[0]) + Math.abs(px - dest[1])
+
+    if (distance == 0) {
+      minSteps = Math.min(minSteps, steps)
+      console.log("Min:", minSteps)
+      continue
+    }
+
+    const key = [steps, py, px].join(":")
+    if (key in seen) continue
+    seen[key] = true
+
+    // Dead end
+    if (steps + distance >= minSteps || steps + distance >= maxSteps) continue
+    if (blizzards.find(([y, x]) => y == py && px == x)) continue
+
+    // Update blizzard the movements for next cycle
+    const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, dest))
+
+    // Draws the current snapshot of the game state
+    // const map = buildMap(grid, player, movedBlizzards)
+
+    // Can player move down?
+    if (py < dest[0] - 1 || px == dest[1]) {
+      stack.push([[py + 1, px], movedBlizzards, steps + 1])
+    }
+
+    // Can player move up?
+    if (py > 1 || (py > 0 && px == start[1])) {
+      stack.push([[py - 1, px], movedBlizzards, steps + 1])
+    }
+
+    // Can player move right?
+    if (px < dest[1] && py > 0) {
+      stack.push([[py, px + 1], movedBlizzards, steps + 1])
+    }
+
+    // Can player move left?
+    if (px > 1 && py > 0) {
+      stack.push([[py, px - 1], movedBlizzards, steps + 1])
+    }
+
+    // Wait for one round
+    stack.push([[py, px], movedBlizzards, steps + 1])
+  }
+
+  return minSteps
 }
 
 // console.log("Sample:", [{ data: sample }].map(solve2))
