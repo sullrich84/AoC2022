@@ -143,7 +143,7 @@ const solve1 = ({ data }) => {
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-console.log("Task:", [{ data: data }].map(solve1))
+// console.log("Task:", [{ da/ta: data }].map(solve1))
 
 /// Part 2
 
@@ -151,22 +151,24 @@ const solve2 = ({ data }) => {
   const initialBlizzards = parseBlizzards(data)
   const grid = parseGrid(data)
 
-  const start = [0, 1]
-  const dest = [grid.length - 1, grid[0].length - 2]
+  const start = [grid.length - 1, grid[0].length - 2]
+  const finish = [0, 1]
 
   const stack = []
   const seen = {}
 
-  var minSteps = Number.POSITIVE_INFINITY
-  var maxSteps = 500
+  const nextDest = [finish, start, finish]
 
-  stack.push([[0, 1], dest, initialBlizzards, 0])
+  var minSteps = Number.POSITIVE_INFINITY
+  var maxSteps = 900
+
+  stack.push([[0, 1], initialBlizzards, 0])
 
   while (stack.length > 0) {
-    const [player, destination, blizzards, steps] = stack.pop()
+    const [player, blizzards, steps] = stack.pop()
     const [py, px] = [...player]
 
-    const distance = Math.abs(py - dest[0]) + Math.abs(px - dest[1])
+    const distance = Math.abs(py - finish[0]) + Math.abs(px - finish[1])
 
     if (distance == 0) {
       minSteps = Math.min(minSteps, steps)
@@ -183,23 +185,23 @@ const solve2 = ({ data }) => {
     if (blizzards.find(([y, x]) => y == py && px == x)) continue
 
     // Update blizzard the movements for next cycle
-    const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, dest))
+    const movedBlizzards = blizzards.map((b) => moveBlizzard(b, start, finish))
 
     // Draws the current snapshot of the game state
     // const map = buildMap(grid, player, movedBlizzards)
 
     // Can player move down?
-    if (py < dest[0] - 1 || px == dest[1]) {
+    if (py < finish[0] - 1 || (py == start[0] && px == start[1]) || (py == finish[0] && px == finish[1] - 1)) {
       stack.push([[py + 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move up?
-    if (py > 1 || (py > 0 && px == start[1])) {
+    if (py > 1 || (py == start[0] + 1 && px == start[1]) || (py == finish[0] && px == finish[1])) {
       stack.push([[py - 1, px], movedBlizzards, steps + 1])
     }
 
     // Can player move right?
-    if (px < dest[1] && py > 0) {
+    if (px < finish[1] && py > 0) {
       stack.push([[py, px + 1], movedBlizzards, steps + 1])
     }
 
