@@ -21,9 +21,9 @@ const solve1 = (ctx, id) => {
   var maxGeodes = 0
 
   while (stack.length > 0) {
-    const [mats, robots, timeleft] = stack.pop()
+    const [mats, bots, timeleft] = stack.pop()
     const [ore, clay, obsidian, geodes] = mats
-    const [oreRobots, clayRobots, obsidianRobots, geodeRobots] = robots
+    const [oreBots, clayBots, obsidianBots, geodeBots] = bots
 
     if (timeleft <= 0) {
       maxGeodes = Math.max(maxGeodes, geodes)
@@ -31,22 +31,22 @@ const solve1 = (ctx, id) => {
     }
 
     // Optimization: Skip redundant states
-    const key = [mats, robots, timeleft].join()
+    const key = [mats, bots, timeleft].join()
     if (key in seen) continue
     seen[key] = 1
 
     const [nextOre, nextClay, nextObsidian, nextGeodes] = [
-      ore + oreRobots,
-      clay + clayRobots,
-      obsidian + obsidianRobots,
-      geodes + geodeRobots,
+      ore + oreBots,
+      clay + clayBots,
+      obsidian + obsidianBots,
+      geodes + geodeBots,
     ]
 
     // WAITING ROUND
     // Optimization: Only wait if we can't even produce one single robot
     const nextMats = [nextOre, nextClay, nextObsidian, nextGeodes]
-    const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots]
-    stack.push([nextMats, nextRobots, timeleft - 1])
+    const nextBots = [oreBots, clayBots, obsidianBots, geodeBots]
+    stack.push([nextMats, nextBots, timeleft - 1])
 
     // Optimization: Skip states that will lead to an ore overflow
     // if (ore >= timeleft * oMax) {
@@ -56,30 +56,30 @@ const solve1 = (ctx, id) => {
     // GEODE ROBOT
     if (ore >= ctx.geodeRobot.ore && obsidian >= ctx.geodeRobot.obsidian) {
       const nextMats = [nextOre - ctx.geodeRobot.ore, nextClay, nextObsidian - ctx.geodeRobot.obsidian, nextGeodes]
-      const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots + 1]
+      const nextRobots = [oreBots, clayBots, obsidianBots, geodeBots + 1]
       stack.push([nextMats, nextRobots, timeleft - 1])
       continue
     }
 
     // OBSIDIAN ROBOT
-    if (obsidianRobots < maxObsidian && ore >= ctx.obsidianRobot.ore && clay >= ctx.obsidianRobot.clay) {
+    if (obsidianBots < maxObsidian && ore >= ctx.obsidianRobot.ore && clay >= ctx.obsidianRobot.clay) {
       const nextMats = [nextOre - ctx.obsidianRobot.ore, nextClay - ctx.obsidianRobot.clay, nextObsidian, nextGeodes]
-      const nextRobots = [oreRobots, clayRobots, obsidianRobots + 1, geodeRobots]
+      const nextRobots = [oreBots, clayBots, obsidianBots + 1, geodeBots]
       stack.push([nextMats, nextRobots, timeleft - 1])
       continue
     }
 
     // CLAY ROBOT
-    if (clayRobots < maxClay && ore >= ctx.clayRobot.ore) {
+    if (clayBots < maxClay && ore >= ctx.clayRobot.ore) {
       const nextMats = [nextOre - ctx.clayRobot.ore, nextClay, nextObsidian, nextGeodes]
-      const nextRobots = [oreRobots, clayRobots + 1, obsidianRobots, geodeRobots]
+      const nextRobots = [oreBots, clayBots + 1, obsidianBots, geodeBots]
       stack.push([nextMats, nextRobots, timeleft - 1])
     }
 
     // ORE ROBOT
-    if (oreRobots < maxOre && ore >= ctx.oreRobot.ore) {
+    if (oreBots < maxOre && ore >= ctx.oreRobot.ore) {
       const nextMats = [nextOre - ctx.oreRobot.ore, nextClay, nextObsidian, nextGeodes]
-      const nextRobots = [oreRobots + 1, clayRobots, obsidianRobots, geodeRobots]
+      const nextRobots = [oreBots + 1, clayBots, obsidianBots, geodeBots]
       stack.push([nextMats, nextRobots, timeleft - 1])
     }
   }
