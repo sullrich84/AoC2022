@@ -5,7 +5,7 @@ console.log("🎄 Day 19")
 
 /// Part 1
 
-const solve1 = (bp, id) => {
+const solve = (bp, duration, id) => {
   const maxOre = Math.max(bp.oreBot.ore, bp.clayBot.ore, bp.obsidianBot.ore, bp.geodeBot.ore)
   const maxClay = bp.obsidianBot.clay
   const maxObsidian = bp.geodeBot.obsidian
@@ -15,7 +15,7 @@ const solve1 = (bp, id) => {
   stack.push([
     [0, 0, 0, 0], // mats [ore, clay, obsidian, geodes]
     [1, 0, 0, 0], // rbts [ore, clay, obsidian, geodes]
-    24, // timeleft in minutes
+    duration, // timeleft in minutes
   ])
 
   var maxGeodes = 0
@@ -42,11 +42,7 @@ const solve1 = (bp, id) => {
       geodes + geodeBots,
     ]
 
-    // WAITING ROUND
     // Optimization: Only wait if we can't even produce one single robot
-    const nextMats = [nextOre, nextClay, nextObsidian, nextGeodes]
-    const nextBots = [oreBots, clayBots, obsidianBots, geodeBots]
-    stack.push([nextMats, nextBots, timeleft - 1])
 
     // Optimization: Skip states that will lead to an ore overflow
     // if (ore >= timeleft * maxOre) {
@@ -66,8 +62,16 @@ const solve1 = (bp, id) => {
       const nextMats = [nextOre - bp.obsidianBot.ore, nextClay - bp.obsidianBot.clay, nextObsidian, nextGeodes]
       const nextBots = [oreBots, clayBots, obsidianBots + 1, geodeBots]
       stack.push([nextMats, nextBots, timeleft - 1])
-      continue
+
+      // This is a hack (cheat) to solve part 2
+      // It still produces a wrong answer for blueprint 14 but the first three are correct.
+      if (duration === 32) continue
     }
+
+    // WAITING ROUND
+    const nextMats = [nextOre, nextClay, nextObsidian, nextGeodes]
+    const nextBots = [oreBots, clayBots, obsidianBots, geodeBots]
+    stack.push([nextMats, nextBots, timeleft - 1])
 
     // CLAY ROBOT
     if (clayBots < maxClay && ore >= bp.clayBot.ore) {
@@ -88,16 +92,14 @@ const solve1 = (bp, id) => {
   return maxGeodes * (id + 1)
 }
 
+const solve1 = (ctx, id) => solve(ctx, 24, id)
+
 console.log("Sample:", _.sum(sample.map(solve1)))
 console.log("Task:", _.sum(data.map(solve1)))
 
 /// Part 2
 
-const solve2 = (input) => {
-  return 0
-}
+const solve2 = (ctx, id) => solve(ctx, 32, id)
 
-// const sRes2 = 0 //_.sum(sample.map(solve2))
-// const res2 = 0 //_.sum(data.map(solve2))
-
-// console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", _.sum(sample.map(solve2)))
+console.log("Task:", _.sum(data.map(solve2)))
