@@ -6,7 +6,9 @@ console.log("🎄 Day 19")
 /// Part 1
 
 const solve1 = (ctx, id) => {
-  const oMax = Math.max(ctx.oreRobot.ore, ctx.clayRobot.ore, ctx.obsidianRobot.ore, ctx.geodeRobot.ore)
+  const maxOre = Math.max(ctx.oreRobot.ore, ctx.clayRobot.ore, ctx.obsidianRobot.ore, ctx.geodeRobot.ore)
+  const maxClay = ctx.obsidianRobot.clay
+  const maxObsidian = ctx.geodeRobot.obsidian
 
   const seen = {}
   const stack = []
@@ -19,7 +21,7 @@ const solve1 = (ctx, id) => {
   var maxGeodes = 0
 
   while (stack.length > 0) {
-    const [mats, robots, timeleft, history] = stack.pop()
+    const [mats, robots, timeleft] = stack.pop()
     const [ore, clay, obsidian, geodes] = mats
     const [oreRobots, clayRobots, obsidianRobots, geodeRobots] = robots
 
@@ -60,7 +62,7 @@ const solve1 = (ctx, id) => {
     }
 
     // OBSIDIAN ROBOT
-    if (ore >= ctx.obsidianRobot.ore && clay >= ctx.obsidianRobot.clay) {
+    if (obsidianRobots < maxObsidian && ore >= ctx.obsidianRobot.ore && clay >= ctx.obsidianRobot.clay) {
       const nextMats = [nextOre - ctx.obsidianRobot.ore, nextClay - ctx.obsidianRobot.clay, nextObsidian, nextGeodes]
       const nextRobots = [oreRobots, clayRobots, obsidianRobots + 1, geodeRobots]
       stack.push([nextMats, nextRobots, timeleft - 1])
@@ -68,15 +70,14 @@ const solve1 = (ctx, id) => {
     }
 
     // CLAY ROBOT
-    if (clayRobots < ctx.obsidianRobot.clay && ore >= ctx.clayRobot.ore) {
+    if (clayRobots < maxClay && ore >= ctx.clayRobot.ore) {
       const nextMats = [nextOre - ctx.clayRobot.ore, nextClay, nextObsidian, nextGeodes]
       const nextRobots = [oreRobots, clayRobots + 1, obsidianRobots, geodeRobots]
       stack.push([nextMats, nextRobots, timeleft - 1])
     }
 
     // ORE ROBOT
-    // Optimization: Never produce more ore robots than we can spend in one round
-    if (oreRobots < oMax && ore >= ctx.oreRobot.ore) {
+    if (oreRobots < maxOre && ore >= ctx.oreRobot.ore) {
       const nextMats = [nextOre - ctx.oreRobot.ore, nextClay, nextObsidian, nextGeodes]
       const nextRobots = [oreRobots + 1, clayRobots, obsidianRobots, geodeRobots]
       stack.push([nextMats, nextRobots, timeleft - 1])
