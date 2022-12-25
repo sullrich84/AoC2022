@@ -11,16 +11,16 @@
     "node-dijkstra": "^2.5.0"
   },
   "scripts": {
-    "day19": "node day19/solve.js",
+    "day16": "node day16/solve.js",
     "day25": "node day25/solve.js",
     "day24": "node day24/solve.js",
     "day23": "node day23/solve.js",
     "day22": "node day22/solve.js",
     "day21": "node day21/solve.js",
     "day20": "node day20/solve.js",
+    "day19": "node day19/solve.js",
     "day18": "node day18/solve.js",
     "day17": "node day17/solve.js",
-    "day16": "node day16/solve.js",
     "day15": "node day15/solve.js",
     "day14": "node day14/solve.js",
     "day13": "node day13/solve.js",
