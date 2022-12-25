@@ -5,257 +5,110 @@ console.log("🎄 Day 19")
 
 /// Part 1
 
-const solve11 = (ctx) => {
-  console.log(ctx.name)
+// if (ore >= ctx.xxx.ore) {
+//   const nextMats = [ore, clay, obsidian, geodes]
+//   const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots]
+//   stack.push([nextMats, nextRobots, minute + 1])
+// }
 
-  const buildOreRobot = (materials, robots, timeLeft) => {
-    if (materials.ore >= ctx.oreRobot.ore) {
-      const rob = { ...robots, oreRobot: robots.oreRobot + 1 }
-      const mat = { ...materials, ore: materials.ore - ctx.oreRobot.ore }
-      return make(mat, rob, timeLeft)
-    }
-    return 0
-  }
+// const nextMats = [ore, clay, obsidian, geodes]
+// const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots]
+// stack.push([nextMats, nextRobots, minute + 1])
 
-  const buildClayRobot = (materials, robots, timeLeft) => {
-    if (materials.ore >= ctx.clayRobot.ore) {
-      const rob = { ...robots, clayRobot: robots.clayRobot + 1 }
-      const mat = { ...materials, ore: materials.ore - ctx.clayRobot.ore }
-      return make(mat, rob, timeLeft)
-    }
-    return 0
-  }
+const solve1 = (ctx) => {
+  const oMax = Math.max(ctx.oreRobot.ore, ctx.clayRobot.ore, ctx.obsidianRobot.ore, ctx.geodeRobot.ore)
+  const oMin = Math.min(ctx.oreRobot.ore, ctx.clayRobot.ore, ctx.obsidianRobot.ore, ctx.geodeRobot.ore)
 
-  const buildObsidianRobot = (materials, robots, timeLeft) => {
-    if (materials.ore >= ctx.obsidianRobot.ore && materials.clay >= ctx.obsidianRobot.clay) {
-      const rob = { ...robots, obsidianRobot: robots.obsidianRobot + 1 }
-      const mat = {
-        ...materials,
-        ore: materials.ore - ctx.obsidianRobot.ore,
-        clay: materials.clay - ctx.obsidianRobot.clay,
-      }
-      return make(mat, rob, timeLeft)
-    }
-    return 0
-  }
+  const seen = {}
+  const stack = []
+  stack.push([
+    [0, 0, 0, 0], // mats [ore, clay, obsidian, geodes]
+    [1, 0, 0, 0], // rbts [ore, clay, obsidian, geodes]
+    24, // timeleft in minutes
+  ])
 
-  const buildGeodeRobot = (materials, robots, timeLeft) => {
-    if (materials.ore >= ctx.geodeRobot.ore && materials.obsidian >= ctx.geodeRobot.obsidian) {
-      const rob = { ...robots, geodeRobot: robots.geodeRobot + 1 }
-      const mat = {
-        ...materials,
-        ore: materials.ore - ctx.geodeRobot.ore,
-        obsidian: materials.obsidian - ctx.geodeRobot.obsidian,
-      }
-      return make(mat, rob, timeLeft)
-    }
-    return 0
-  }
+  var maxGeodes = 0
 
-  const cache = {}
-  const make = (materials, robots, timeLeft) => {
-    timeLeft -= 1
-    if (timeLeft <= 0) return 0
-    // console.log("Minute ", timeLeft)
+  while (stack.length > 0) {
+    const [mats, robots, timeleft] = stack.pop()
 
-    const key = JSON.stringify({ materials }) + JSON.stringify({ robots }) + timeLeft
-    if (key in cache) {
-      return cache[key]
+    var [ore, clay, obsidian, geodes] = mats
+    const [oreRobots, clayRobots, obsidianRobots, geodeRobots] = robots
+
+    // Update materials available in this round
+    ore += oreRobots
+    clay += clayRobots
+    obsidian += obsidianRobots
+    geodes += geodeRobots
+
+    if (timeleft < 0) {
+      console.log(timeleft, geodes)
+      maxGeodes = Math.max(maxGeodes, geodes)
+      continue
     }
 
-    // Update materials
-    materials.ore += robots.oreRobot
-    materials.clay += robots.clayRobot
-    materials.obsidian += robots.obsidianRobot
-    materials.geode += robots.geodeRobot
+    // Optimization: Skip redundant states
+    const key = [mats, robots, timeleft].join()
+    if (key in seen) continue
+    seen[key] = 1
 
-    var best = materials.geode
+    // WAITING ROUND
+    // Optimization: Only wait if we can't even produce one single robot
+    if (ore < oMin) {
+      const nextMats = [ore, clay, obsidian, geodes]
+      const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots]
+      stack.push([nextMats, nextRobots, timeleft - 1])
+      continue
+    }
 
-    // Build nothing
-    best = make(materials, robots, timeLeft)
+    // Optimization: Skip states that will lead to an ore overflow
+    if (ore >= timeleft * oMax) {
+      continue
+    }
 
-    // Build robots (16 permutations)
-    best = _.max([
-      best,
-      buildOreRobot(materials, robots, timeLeft),
-      buildClayRobot(materials, robots, timeLeft),
-      buildObsidianRobot(materials, robots, timeLeft),
-      buildGeodeRobot(materials, robots, timeLeft),
-    ])
+    // ORE ROBOT
+    // Optimization: Never produce more ore robots than we can spend in one round
+    if (oreRobots < oMax && ore >= ctx.oreRobot.ore) {
+      const nextMats = [ore - ctx.oreRobot.ore, clay, obsidian, geodes]
+      const nextRobots = [oreRobots + 1, clayRobots, obsidianRobots, geodeRobots]
+      stack.push([nextMats, nextRobots, timeleft - 1])
+    }
 
-    best = _.max([
-      best,
-      buildClayRobot(materials, robots, timeLeft),
-      buildOreRobot(materials, robots, timeLeft),
-      buildObsidianRobot(materials, robots, timeLeft),
-      buildGeodeRobot(materials, robots, timeLeft),
-    ])
+    // CLAY ROBOT
+    if (ore >= ctx.clayRobot.ore) {
+      const nextMats = [ore - ctx.clayRobot.ore, clay, obsidian, geodes]
+      const nextRobots = [oreRobots, clayRobots + 1, obsidianRobots, geodeRobots]
+      stack.push([nextMats, nextRobots, timeleft - 1])
+    }
 
-    best = _.max([
-      best,
-      buildClayRobot(materials, robots, timeLeft),
-      buildObsidianRobot(materials, robots, timeLeft),
-      buildOreRobot(materials, robots, timeLeft),
-      buildGeodeRobot(materials, robots, timeLeft),
-    ])
+    // OBSIDIAN ROBOT
+    if (ore >= ctx.obsidianRobot.ore && clay >= ctx.obsidianRobot.clay) {
+      const nextMats = [ore - ctx.obsidianRobot.ore, clay - ctx.obsidianRobot.clay, obsidian, geodes]
+      const nextRobots = [oreRobots, clayRobots, obsidianRobots + 1, geodeRobots]
+      stack.push([nextMats, nextRobots, timeleft - 1])
+    }
 
-    best = _.max([
-      best,
-      buildClayRobot(materials, robots, timeLeft),
-      buildObsidianRobot(materials, robots, timeLeft),
-      buildGeodeRobot(materials, robots, timeLeft),
-      buildOreRobot(materials, robots, timeLeft),
-    ])
-
-    cache[key] = best
-    return best
+    // GEODE ROBOT
+    if (ore >= ctx.geodeRobot.ore && obsidian >= ctx.geodeRobot.obsidian) {
+      const nextMats = [ore - ctx.geodeRobot.ore, clay, obsidian - ctx.geodeRobot.obsidian, geodes]
+      const nextRobots = [oreRobots, clayRobots, obsidianRobots, geodeRobots + 1]
+      stack.push([nextMats, nextRobots, timeleft - 1])
+    }
   }
 
-  const robots = {
-    oreRobot: 1,
-    clayRobot: 0,
-    obsidianRobot: 0,
-    geodeRobot: 0,
-  }
-
-  const materials = {
-    ore: 0,
-    clay: 0,
-    obsidian: 0,
-    geode: 0,
-  }
-
-  return make(materials, robots, 24)
+  return maxGeodes
 }
 
-const solve1 = ({ name, oreRobot, clayRobot, obsidianRobot, geodeRobot }) => {
-  console.log(name)
-
-  const make = (timeleft) => {
-    const queue = [
-      {
-        ore: 0,
-        clay: 0,
-        obsidian: 0,
-        geodes: 0,
-        oreRbts: 1,
-        clayRbts: 0,
-        obsidianRbts: 0,
-        geodeRbts: 0,
-        timeleft,
-      },
-    ]
-
-    const minOreCosts = _.min([oreRobot.ore, clayRobot.ore, obsidianRobot.ore, geodeRobot.ore])
-    const maxOreCosts = _.max([oreRobot.ore, clayRobot.ore, obsidianRobot.ore, geodeRobot.ore])
-
-    const seen = {}
-    var best = 0
-
-    while (queue.length > 0) {
-      var state = queue.pop()
-      const { ore, clay, obsidian, geodes, timeleft } = state
-      const { oreRbts, clayRbts, obsidianRbts, geodeRbts } = state
-
-      // Track the best geodes output
-      best = _.max([best, geodes])
-
-      // Skip further production since we ran out of time
-      if (timeleft <= 0) continue
-
-      // Optimization 1: Skip paths where we cant spend all of our ores
-      if (ore >= maxOreCosts * timeleft) continue
-
-      // Optimization 2: Skip rounds where we cant afford anything
-      if (ore < minOreCosts) {
-        queue.push({
-          ...state,
-          ore: ore + oreRbts,
-          clay: clay + clayRbts,
-          obsidian: obsidian + obsidianRbts,
-          geodes: geodes + geodeRbts,
-          timeleft: timeleft - 1,
-        })
-        continue
-      }
-
-      // Check if state has been computed before
-      const key = JSON.stringify(state)
-      if (key in seen) continue
-      seen[key] = timeleft
-
-      // Produce ore robot
-      if (ore >= oreRobot.ore) {
-        queue.push({
-          ...state,
-          ore: ore + oreRbts - oreRobot.ore,
-          clay: clay + clayRbts,
-          obsidian: obsidian + obsidianRbts,
-          geodes: geodes + geodeRbts,
-          oreRbts: oreRbts + 1,
-          timeleft: timeleft - 1,
-        })
-      }
-
-      // Produce clay robot
-      if (ore >= clayRobot.ore) {
-        queue.push({
-          ...state,
-          ore: ore + oreRbts - clayRobot.ore,
-          clay: clay + clayRbts,
-          obsidian: obsidian + obsidianRbts,
-          geodes: geodes + geodeRbts,
-          clayRbts: clayRbts + 1,
-          timeleft: timeleft - 1,
-        })
-      }
-
-      // Produce obsidian robot
-      if (ore >= obsidianRobot.ore && clay >= obsidianRobot.clay) {
-        queue.push({
-          ...state,
-          ore: ore + oreRbts - obsidianRobot.ore,
-          clay: clay + clayRbts - obsidianRobot.clay,
-          obsidian: obsidian + obsidianRbts,
-          geodes: geodes + geodeRbts,
-          obsidianRbts: obsidianRbts + 1,
-          timeleft: timeleft - 1,
-        })
-      }
-
-      // Produce geode robot
-      if (ore >= geodeRobot.ore && obsidian >= geodeRobot.obsidian) {
-        queue.push({
-          ...state,
-          ore: ore + oreRbts - clayRobot.ore,
-          clay: clay + clayRbts,
-          obsidian: obsidian + obsidianRbts - geodeRobot.obsidian,
-          geodes: geodes + geodeRbts,
-          geodeRbts: geodeRbts + 1,
-          timeleft: timeleft - 1,
-        })
-      }
-    }
-
-    return best
-  }
-
-  return make(24)
-}
-
-const sRes1 = sample.map(solve1)
-const res1 = 0 //[{ data: data }].map(solve1)
-
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", sample.map(solve1))
+// console.log("Task:", data.map(solve1))
 
 /// Part 2
 
 const solve2 = (input) => {
-  console.log(input)
   return 0
 }
 
-const sRes2 = 0 //_.sum(sample.map(solve2))
-const res2 = 0 //_.sum(data.map(solve2))
+// const sRes2 = 0 //_.sum(sample.map(solve2))
+// const res2 = 0 //_.sum(data.map(solve2))
 
-console.log("Sample:", sRes2, "Task:", res2)
+// console.log("Sample:", sRes2, "Task:", res2)
