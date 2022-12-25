@@ -5,10 +5,10 @@ console.log("🎄 Day 19")
 
 /// Part 1
 
-const solve1 = (ctx, id) => {
-  const maxOre = Math.max(ctx.oreBot.ore, ctx.clayBot.ore, ctx.obsidianBot.ore, ctx.geodeBot.ore)
-  const maxClay = ctx.obsidianBot.clay
-  const maxObsidian = ctx.geodeBot.obsidian
+const solve1 = (bp, id) => {
+  const maxOre = Math.max(bp.oreBot.ore, bp.clayBot.ore, bp.obsidianBot.ore, bp.geodeBot.ore)
+  const maxClay = bp.obsidianBot.clay
+  const maxObsidian = bp.geodeBot.obsidian
 
   const seen = {}
   const stack = []
@@ -49,42 +49,42 @@ const solve1 = (ctx, id) => {
     stack.push([nextMats, nextBots, timeleft - 1])
 
     // Optimization: Skip states that will lead to an ore overflow
-    // if (ore >= timeleft * oMax) {
+    // if (ore >= timeleft * maxOre) {
     //   continue
     // }
 
     // GEODE ROBOT
-    if (ore >= ctx.geodeBot.ore && obsidian >= ctx.geodeBot.obsidian) {
-      const nextMats = [nextOre - ctx.geodeBot.ore, nextClay, nextObsidian - ctx.geodeBot.obsidian, nextGeodes]
+    if (ore >= bp.geodeBot.ore && obsidian >= bp.geodeBot.obsidian) {
+      const nextMats = [nextOre - bp.geodeBot.ore, nextClay, nextObsidian - bp.geodeBot.obsidian, nextGeodes]
       const nextBots = [oreBots, clayBots, obsidianBots, geodeBots + 1]
       stack.push([nextMats, nextBots, timeleft - 1])
       continue
     }
 
     // OBSIDIAN ROBOT
-    if (obsidianBots < maxObsidian && ore >= ctx.obsidianBot.ore && clay >= ctx.obsidianBot.clay) {
-      const nextMats = [nextOre - ctx.obsidianBot.ore, nextClay - ctx.obsidianBot.clay, nextObsidian, nextGeodes]
+    if (obsidianBots < maxObsidian && ore >= bp.obsidianBot.ore && clay >= bp.obsidianBot.clay) {
+      const nextMats = [nextOre - bp.obsidianBot.ore, nextClay - bp.obsidianBot.clay, nextObsidian, nextGeodes]
       const nextBots = [oreBots, clayBots, obsidianBots + 1, geodeBots]
       stack.push([nextMats, nextBots, timeleft - 1])
       continue
     }
 
     // CLAY ROBOT
-    if (clayBots < maxClay && ore >= ctx.clayBot.ore) {
-      const nextMats = [nextOre - ctx.clayBot.ore, nextClay, nextObsidian, nextGeodes]
+    if (clayBots < maxClay && ore >= bp.clayBot.ore) {
+      const nextMats = [nextOre - bp.clayBot.ore, nextClay, nextObsidian, nextGeodes]
       const nextBots = [oreBots, clayBots + 1, obsidianBots, geodeBots]
       stack.push([nextMats, nextBots, timeleft - 1])
     }
 
     // ORE ROBOT
-    if (oreBots < maxOre && ore >= ctx.oreBot.ore) {
-      const nextMats = [nextOre - ctx.oreBot.ore, nextClay, nextObsidian, nextGeodes]
+    if (oreBots < maxOre && ore >= bp.oreBot.ore) {
+      const nextMats = [nextOre - bp.oreBot.ore, nextClay, nextObsidian, nextGeodes]
       const nextBots = [oreBots + 1, clayBots, obsidianBots, geodeBots]
       stack.push([nextMats, nextBots, timeleft - 1])
     }
   }
 
-  console.log(`Best geode output for ${ctx.name} is ${maxGeodes}`)
+  console.log(`Best geode output for ${bp.name} is ${maxGeodes}`)
   return maxGeodes * (id + 1)
 }
 
