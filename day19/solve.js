@@ -6,8 +6,9 @@ console.log("🎄 Day 19")
 /// Part 1
 
 const solve = (ctx, duration, id) => {
-  const oMax = Math.max(ctx.oreBot.ore, ctx.clayBot.ore, ctx.obsidianBot.ore, ctx.geodeBot.ore)
-  const oMin = Math.min(ctx.oreBot.ore, ctx.clayBot.ore, ctx.obsidianBot.ore, ctx.geodeBot.ore)
+  const maxOre = Math.max(ctx.oreBot.ore, ctx.clayBot.ore, ctx.obsidianBot.ore, ctx.geodeBot.ore)
+  const maxClay = ctx.obsidianBot.clay
+  const maxObsidian = ctx.geodeBot.obsidian
 
   const seen = {}
   const stack = []
@@ -44,50 +45,45 @@ const solve = (ctx, duration, id) => {
     // Optimization: Skip branches that can reach new max
     // if (timeleft * geodeBots < maxGeodes) continue
 
-    const produceOreBot = oreBot < oMax && ore >= ctx.oreBot.ore
-    const produceClayBot = clayBot < ctx.obsidianBot.clay && ore >= ctx.clayBot.ore
-    const produceObsidianBot = obsidianBot < ctx.geodeBot.obsidian && ore >= ctx.obsidianBot.ore && clay >= ctx.obsidianBot.clay
-    const produceGeodeBot = ore >= ctx.geodeBot.ore && obsidian >= ctx.geodeBot.obsidian
-
     // WAITING ROUND
     // Optimization: Only wait if we can't even produce one single robot
-    // if (oreBots < oMax || clayBots < ctx.obsidianBot.clay || obsidianBots < ctx.geodeBot.obsidian) {
     const nextMats = [nextOre, nextClay, nextObsidian, nextGeodes]
     const nextBots = [oreBot, clayBot, obsidianBot, geodeBot]
     stack.push([nextMats, nextBots, timeleft - 1])
-    // }
 
     // Optimization: Skip states that will lead to an ore overflow
-    if (ore >= timeleft * oMax) continue
-
-    // ORE ROBOT
-    // Optimization: Never produce more ore than we can spend in one round
-    if (oreBot < oMax && ore >= ctx.oreBot.ore) {
-      const nextMats = [nextOre - ctx.oreBot.ore, nextClay, nextObsidian, nextGeodes]
-      const nextBots = [oreBot + 1, clayBot, obsidianBot, geodeBot]
-      stack.push([nextMats, nextBots, timeleft - 1])
-    }
-
-    // CLAY ROBOT
-    // Optimization: Never produce more clay than we can spend in one round
-    if (clayBot < ctx.obsidianBot.clay && ore >= ctx.clayBot.ore) {
-      const nextMats = [nextOre - ctx.clayBot.ore, nextClay, nextObsidian, nextGeodes]
-      const nextBots = [oreBot, clayBot + 1, obsidianBot, geodeBot]
-      stack.push([nextMats, nextBots, timeleft - 1])
-    }
-
-    // OBSIDIAN ROBOT
-    // Optimization: Never produce more obsidian than we can spend in one round
-    if (obsidianBot < ctx.geodeBot.obsidian && ore >= ctx.obsidianBot.ore && clay >= ctx.obsidianBot.clay) {
-      const nextMats = [nextOre - ctx.obsidianBot.ore, nextClay - ctx.obsidianBot.clay, nextObsidian, nextGeodes]
-      const nextBots = [oreBot, clayBot, obsidianBot + 1, geodeBot]
-      stack.push([nextMats, nextBots, timeleft - 1])
-    }
+    if (ore >= timeleft * maxOre) continue
 
     // GEODE ROBOT
     if (ore >= ctx.geodeBot.ore && obsidian >= ctx.geodeBot.obsidian) {
       const nextMats = [nextOre - ctx.geodeBot.ore, nextClay, nextObsidian - ctx.geodeBot.obsidian, nextGeodes]
       const nextBots = [oreBot, clayBot, obsidianBot, geodeBot + 1]
+      stack.push([nextMats, nextBots, timeleft - 1])
+      continue
+    }
+
+    // OBSIDIAN ROBOT
+    // Optimization: Never produce more obsidian than we can spend in one round
+    if (obsidianBot < maxObsidian && ore >= ctx.obsidianBot.ore && clay >= ctx.obsidianBot.clay) {
+      const nextMats = [nextOre - ctx.obsidianBot.ore, nextClay - ctx.obsidianBot.clay, nextObsidian, nextGeodes]
+      const nextBots = [oreBot, clayBot, obsidianBot + 1, geodeBot]
+      stack.push([nextMats, nextBots, timeleft - 1])
+      continue
+    }
+
+    // CLAY ROBOT
+    // Optimization: Never produce more clay than we can spend in one round
+    if (clayBot < maxClay && ore >= ctx.clayBot.ore) {
+      const nextMats = [nextOre - ctx.clayBot.ore, nextClay, nextObsidian, nextGeodes]
+      const nextBots = [oreBot, clayBot + 1, obsidianBot, geodeBot]
+      stack.push([nextMats, nextBots, timeleft - 1])
+    }
+
+    // ORE ROBOT
+    // Optimization: Never produce more ore than we can spend in one round
+    if (oreBot < maxOre && ore >= ctx.oreBot.ore) {
+      const nextMats = [nextOre - ctx.oreBot.ore, nextClay, nextObsidian, nextGeodes]
+      const nextBots = [oreBot + 1, clayBot, obsidianBot, geodeBot]
       stack.push([nextMats, nextBots, timeleft - 1])
     }
   }
