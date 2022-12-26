@@ -141,11 +141,13 @@ const solve2 = ({ mapData, moveData, sections }) => {
       if (direction === "U") [vy, vx] = vUp
       ;[ny, nx] = [y + vy, x + vx]
 
-      // Validate the next tile we move to
-
-      // Check if we passed an eded
+      // Check if we will pass an eded
       var [sec, nSec] = [_.get(section, [y, x], 0), _.get(section, [ny, nx], 0)]
       if (sec !== nSec) {
+        const row = map[y]
+        const col = map.map((r) => r[x])
+
+        var [wy, wx] = [ny, nx]
         var nDirection = direction
 
         if (sec === 5) {
@@ -279,29 +281,20 @@ const solve2 = ({ mapData, moveData, sections }) => {
             nDirection = "U"
           }
         }
-      }
-
-      var nt = _.get(map, [ny, nx], " ")
-      if (nt === "#") break
-
-      if (nt === " ") {
-        // This becomes obsolete
-        const row = map[y]
-        const col = map.map((r) => r[x])
-        var [wy, wx] = [ny, nx]
-        if (direction === "R") wx = row.findIndex((t) => t !== " ")
-        if (direction === "D") wy = col.findIndex((t) => t !== " ")
-        if (direction === "L") wx = row.length - 1 - [...row].reverse().findIndex((t) => t !== " ")
-        if (direction === "U") wy = col.length - 1 - [...col].reverse().findIndex((t) => t !== " ")
 
         // Avoid warping into wall
         var wt = _.get(map, [wy, wx], " ")
         if (wt === "#") break
 
         // Update nt since we updated the underlaying coordiantes
+        direction = nDirection
         ny = wy
         nx = wx
       }
+
+      // Validate the next tile we move to
+      var nt = _.get(map, [ny, nx], " ")
+      if (nt === "#") break
 
       // Assign new position (warped/moved)
       y = ny
