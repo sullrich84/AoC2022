@@ -151,108 +151,132 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 5) {
           if (direction === "R") {
             // Move to section 6L; no action
+            nDirection = "R"
           }
 
           if (direction === "D") {
             // Move to section 1U; no action
+            nDirection = "D"
           }
 
           if (direction === "L") {
             // Warp to section 2L 180
+            nDirection = "R"
           }
 
           if (direction === "U") {
             // Warp to section 3L -90
+            nDirection = "R"
           }
         }
 
         if (sec === 6) {
           if (direction === "R") {
             // Warp to section 4R 180
+            nDirection = "L"
           }
 
           if (direction === "D") {
             // Warp to section 1R -90
+            nDirection = "L"
           }
 
           if (direction === "L") {
             // Move to section 5R; no action
+            nDirection = "L"
           }
 
           if (direction === "U") {
             // Warp to section 3D 0
+            nDirection = "U"
           }
         }
 
         if (sec === 1) {
           if (direction === "R") {
             // Warp to section 6D 90
+            nDirection = "U"
           }
 
           if (direction === "D") {
             // Move to section 4U; no action
+            nDirection = "D"
           }
 
           if (direction === "L") {
             // Warp to section 2U 90
+            nDirection = "D"
           }
 
           if (direction === "U") {
             // Move to section 5D; no action
+            nDirection = "U"
           }
         }
 
         if (sec === 4) {
           if (direction === "R") {
             // Warp to section 6R 180
+            nDirection = "L"
           }
 
           if (direction === "D") {
             // Warp to section 3R -90
+            nDirection = "L"
           }
 
           if (direction === "L") {
             // Move to section 2R; no action
+            nDirection = "L"
           }
 
           if (direction === "U") {
             // Move to section 1D; no action
+            nDirection = "U"
           }
         }
 
         if (sec === 2) {
           if (direction === "R") {
             // Move to section 4L; no action
+            nDirection = "R"
           }
 
           if (direction === "D") {
             // Move to section 3U; no action
+            nDirection = "D"
           }
 
           if (direction === "L") {
             // Warp to section 5L 180
+            nDirection = "R"
           }
 
           if (direction === "U") {
             // Warp to section 1L -90
+            nDirection = "R"
           }
         }
 
         if (sec === 3) {
           if (direction === "R") {
             // Warp to section 4D 90
+            nDirection = "U"
           }
 
           if (direction === "D") {
             // Warp to section 6U 0
+            nDirection = "D"
           }
 
           if (direction === "L") {
             // Warp to section 5U 90
+            nDirection = "D"
           }
 
           if (direction === "U") {
             // Move to section 2D; no action
+            nDirection = "U"
           }
         }
       }
