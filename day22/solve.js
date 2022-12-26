@@ -49,6 +49,8 @@ const solve1 = ({ mapData, moveData }) => {
     trace.push(row.split("").map((t) => (t === " " ? tiles.void : t)))
   })
 
+  const history = []
+
   const nextPosition = (dir, [y, x]) => {
     switch (dir) {
       case "R":
@@ -96,6 +98,8 @@ const solve1 = ({ mapData, moveData }) => {
 
     for (var s = 0; s < steps; s++) {
       const [y, x] = pos
+      history.push([y, x])
+
       if (map[y][x] !== tiles.floor) throw "invalid move"
 
       // Visualization + Debug :)
@@ -125,12 +129,12 @@ const solve1 = ({ mapData, moveData }) => {
   const col = pos[1] + 1
   const facing = rotate[dir].facing
 
-  // console.log(trace.map((t) => t.join("")))
+  console.log(`Stopped at ${pos[0]},${pos[1]} facing ${dir}`)
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
 // console.log("Sample:", [{ mapData: sample[0], moveData: sample[1] }].map(solve1))
-// console.log("Task:", [{ mapData: data[0], moveData: data[1] }].map(solve1))
+console.log("Task:", [{ mapData: data[0], moveData: data[1] }].map(solve1))
 
 /// Part 2
 
@@ -138,89 +142,73 @@ const solve2 = ({ mapData, moveData, sections }) => {
   const map = mapData.map((row) => row.split(""))
   const section = sections.map((row) => row.split("").map((t) => parseInt(t) || 0))
   const trace = mapData.map((row) => row.split("").map((t) => (t === " " ? tiles.void : t)))
+  const move = moveData.map((i) => parseInt(i) || i)
 
-  const warp = (dir, [y, x]) => {
-    if (dir === "R") {
-      return [dir, y, map[y].findIndex((t) => t !== tiles.void)]
-    }
+  const [vRight, vDown, vLeft, vUp] = [
+    [0, 1], // right
+    [1, 0], // down
+    [0, -1], // left
+    [-1, 0], // up
+  ]
 
-    if (dir === "L") {
-      const r = [...map[y]]
-      return [dir, y, r.length - 1 - r.reverse().findIndex((t) => t !== tiles.void)]
-    }
+  // Find start position x
+  const firstFloor = map[0].findIndex((t) => t === ".")
 
-    if (dir === "U") {
-      const c = map.map((r) => r[x]).reverse()
-      return [dir, map.length - 1 - c.findIndex((t) => t !== tiles.void), x]
-    }
-
-    if (dir === "D") {
-      const c = map.map((r) => r[x])
-      return [dir, c.findIndex((t) => t !== tiles.void), x]
-    }
-  }
-
-  var pos = [0, map[0].findIndex((t) => t === tiles.floor)]
-  const move = [...moveData]
+  // Inital setup
+  var [y, x] = [0, firstFloor]
+  var direction, steps
 
   while (move.length > 0) {
-    var [nextDir, steps] = [dir == null ? "R" : move.shift(), parseInt(move.shift())]
-    var dir = dir == null ? "R" : rotate[dir][nextDir]
+    direction = direction ? rotate[direction][move.shift()] : "R"
+    steps = move.shift()
 
     for (var s = 0; s < steps; s++) {
-      const [y, x] = pos
-      if (map[y][x] !== tiles.floor) throw "invalid move"
-      trace[y][x] = rotate[dir].symbol
+      if (_.get(map, [y, x], " ") !== ".") throw "Invalid position"
+      trace[y][x] = direction
+      // We're currently at y,x! Move one step
 
-      // Next coordinates
-      var [ny, nx] = [...pos]
+      var vx, vy, ny, nx
+      if (direction === "R") [vy, vx] = vRight
+      if (direction === "D") [vy, vx] = vDown
+      if (direction === "L") [vy, vx] = vLeft
+      if (direction === "U") [vy, vx] = vUp
+      ;[ny, nx] = [y + vy, x + vx]
 
-      if (dir === "R") {
-        if (x + 1 > map[y].length - 1) return warp(dir, [y, x])
-        nx = x + 1
-      } else if (dir === "L") {
-        if (x - 1 < 0) return warp(dir, [y, x])
-        nx = x - 1
-      } else if (dir === "U") {
-        if (y - 1 < 0) return warp(dir, [y, x])
-        ny = y - 1
-      } else if (dir === "D") {
-        if (y + 1 > map.length - 1) return warp(dir, [y, x])
-        ny = y + 1
+      // Validate the next tile we move to
+      var nt = _.get(map, [ny, nx], " ")
+      if (nt === "#") break
+
+      if (nt === " ") {
+        const row = map[y]
+        const col = map.map((r) => r[x])
+        var [wy, wx] = [ny, nx]
+        if (direction === "R") wx = row.findIndex((t) => t !== " ")
+        if (direction === "D") wy = col.findIndex((t) => t !== " ")
+        if (direction === "L") wx = row.length - 1 - [...row].reverse().findIndex((t) => t !== " ")
+        if (direction === "U") wy = col.length - 1 - [...col].reverse().findIndex((t) => t !== " ")
+
+        // Avoid warping into wall
+        var wt = _.get(map, [wy, wx], " ")
+        if (wt === "#") break
+
+        // Update nt since we updated the underlaying coordiantes
+        ny = wy
+        nx = wx
       }
 
-      const sec = section[y][x]
-      const nSec = section[ny][nx]
-
-      // Moved over edge
-      if (sec != nSec) {
-        console.log("moved over edge:", sec, nSec)
-      }
-
-      // Hit a wall
-      if (map[ny][nx] === tiles.wall) break
-
-      // Set new position for next round
-      if (map[ny][nx] === tiles.floor) pos = [ny, nx]
-
-      if (map[ny][nx] === tiles.void) {
-        // Warped into wall. Stay where we are end end round
-        const [wdir, wy, wx] = warp(dir, pos)
-        if (map[wy][wx] !== tiles.floor) break
-
-        // Set warped target for next round
-        pos = [wy, wx]
-      }
+      // Assign new position (warped/moved)
+      y = ny
+      x = nx
     }
   }
 
-  const row = pos[0] + 1
-  const col = pos[1] + 1
-  const facing = rotate[dir].facing
+  const row = y + 1
+  const col = x + 1
+  const facing = "RDLU".indexOf(direction)
 
-  // console.log(trace.map((t) => t.join("")))
+  console.log(`Stopped at ${y},${x} facing ${direction}`)
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
-// console.log("Sample:", [{ mapData: samplePart2[0], moveData: samplePart2[1], sections: samplePart2[2] }].map(solve2))
-console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: data[2] }].map(solve2))
+// console.log("Sample:", [{ mapData: sample[0], moveData: sample[1], sections: [] }].map(solve2))
+console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: [] }].map(solve2))
