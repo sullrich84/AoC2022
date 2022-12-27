@@ -404,5 +404,7 @@ const solve2 = ({ mapData, moveData, sections }) => {
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
+ // < 96215
+
 console.log("Sample:", [{ mapData: tryout[0], moveData: tryout[1], sections: tryout[2] }].map(solve2))
 // console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: data[2] }].map(solve2))
