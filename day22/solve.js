@@ -37,8 +37,8 @@ const solve1 = ({ mapData, moveData }) => {
     for (var s = 0; s < steps; s++) {
       if (_.get(map, [y, x], " ") !== ".") throw "Invalid position"
       trace[y][x] = direction
-      // We're currently at y,x! Move one step
 
+      // We're currently at y,x! Move one step
       var vx, vy, ny, nx
       if (direction === "R") [vy, vx] = vRight
       if (direction === "D") [vy, vx] = vDown
@@ -159,8 +159,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 5) {
           if (direction === "L") {
             // Warp to section 2L 180
-            const [nSecYmin, nSecYmax] = secLimit[2][0]
-            const [nSecXmin, nSecXmax] = secLimit[2][1]
+            const [_nSecYmin, nSecYmax] = secLimit[2][0]
+            const [nSecXmin, _nSecXmax] = secLimit[2][1]
 
             nDirection = "R"
             wy = nSecYmax - (y % secLen)
@@ -169,8 +169,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "U") {
             // Warp to section 3L -90
-            const [nSecYmin, nSecYmax] = secLimit[3][0]
-            const [nSecXmin, nSecXmax] = secLimit[3][1]
+            const [nSecYmin] = secLimit[3][0]
+            const [nSecXmin] = secLimit[3][1]
 
             nDirection = "R"
             wy = nSecYmin + (x % secLen)
@@ -181,8 +181,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 6) {
           if (direction === "R") {
             // Warp to section 4R 180
-            const [nSecYmin, nSecYmax] = secLimit[4][0]
-            const [nSecXmin, nSecXmax] = secLimit[4][1]
+            const [_nSecYmin, nSecYmax] = secLimit[4][0]
+            const [_nSecXmin, nSecXmax] = secLimit[4][1]
 
             nDirection = "L"
             wy = nSecYmax - (y % secLen)
@@ -191,8 +191,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "D") {
             // Warp to section 1R -90
-            const [nSecYmin, nSecYmax] = secLimit[1][0]
-            const [nSecXmin, nSecXmax] = secLimit[1][1]
+            const [nSecYmin, _nSecYmax] = secLimit[1][0]
+            const [_nSecXmin, nSecXmax] = secLimit[1][1]
 
             nDirection = "L"
             wy = nSecYmin + (x % secLen)
@@ -201,8 +201,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "U") {
             // Warp to section 3D 0
-            const [nSecYmin, nSecYmax] = secLimit[3][0]
-            const [nSecXmin, nSecXmax] = secLimit[3][1]
+            const [_nSecYmin, nSecYmax] = secLimit[3][0]
+            const [nSecXmin, _nSecXmax] = secLimit[3][1]
 
             nDirection = "U"
             wy = nSecYmax
@@ -213,8 +213,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 1) {
           if (direction === "R") {
             // Warp to section 6D 90
-            const [nSecYmin, nSecYmax] = secLimit[6][0]
-            const [nSecXmin, nSecXmax] = secLimit[6][1]
+            const [_nSecYmin, nSecYmax] = secLimit[6][0]
+            const [nSecXmin, _nSecXmax] = secLimit[6][1]
 
             nDirection = "U"
             wy = nSecYmax
@@ -223,8 +223,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "L") {
             // Warp to section 2U 90
-            const [nSecYmin, nSecYmax] = secLimit[2][0]
-            const [nSecXmin, nSecXmax] = secLimit[2][1]
+            const [nSecYmin] = secLimit[2][0]
+            const [nSecXmin] = secLimit[2][1]
             nDirection = "D"
 
             wy = nSecYmin
@@ -235,8 +235,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 4) {
           if (direction === "R") {
             // Warp to section 6R 180
-            const [nSecYmin, nSecYmax] = secLimit[6][0]
-            const [nSecXmin, nSecXmax] = secLimit[6][1]
+            const [_nSecYmin, nSecYmax] = secLimit[6][0]
+            const [_nSecXmin, nSecXmax] = secLimit[6][1]
 
             nDirection = "L"
             wy = nSecYmax - (y % secLen)
@@ -245,8 +245,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "D") {
             // Warp to section 3R -90
-            const [nSecYmin, nSecYmax] = secLimit[3][0]
-            const [nSecXmin, nSecXmax] = secLimit[3][1]
+            const [nSecYmin, _nSecYmax] = secLimit[3][0]
+            const [_nSecXmin, nSecXmax] = secLimit[3][1]
 
             nDirection = "L"
             wy = nSecYmin + (x % secLen)
@@ -257,8 +257,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 2) {
           if (direction === "L") {
             // Warp to section 5L 180
-            const [nSecYmin, nSecYmax] = secLimit[5][0]
-            const [nSecXmin, nSecXmax] = secLimit[5][1]
+            const [_nSecYmin, nSecYmax] = secLimit[5][0]
+            const [nSecXmin, _nSecXmax] = secLimit[5][1]
 
             nDirection = "R"
             wy = nSecYmax - (y % secLen)
@@ -267,8 +267,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "U") {
             // Warp to section 1L -90
-            const [nSecYmin, nSecYmax] = secLimit[1][0]
-            const [nSecXmin, nSecXmax] = secLimit[1][1]
+            const [nSecYmin] = secLimit[1][0]
+            const [nSecXmin] = secLimit[1][1]
 
             nDirection = "R"
             wy = nSecYmin + (x % secLen)
@@ -279,8 +279,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
         if (sec === 3) {
           if (direction === "R") {
             // Warp to section 4D 90
-            const [nSecYmin, nSecYmax] = secLimit[4][0]
-            const [nSecXmin, nSecXmax] = secLimit[4][1]
+            const [_nSecYmin, nSecYmax] = secLimit[4][0]
+            const [nSecXmin, _nSecXmax] = secLimit[4][1]
 
             nDirection = "U"
             wy = nSecYmax
@@ -289,8 +289,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "D") {
             // Warp to section 6U 0
-            const [nSecYmin, nSecYmax] = secLimit[6][0]
-            const [nSecXmin, nSecXmax] = secLimit[6][1]
+            const [nSecYmin] = secLimit[6][0]
+            const [nSecXmin] = secLimit[6][1]
 
             nDirection = "D"
             wy = nSecYmin
@@ -299,8 +299,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
           if (direction === "L") {
             // Warp to section 5U 90
-            const [nSecYmin, nSecYmax] = secLimit[5][0]
-            const [nSecXmin, nSecXmax] = secLimit[5][1]
+            const [nSecYmin] = secLimit[5][0]
+            const [nSecXmin] = secLimit[5][1]
 
             nDirection = "D"
             wy = nSecYmin
