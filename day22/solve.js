@@ -167,6 +167,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
       if (direction === "U") [vy, vx] = vUp
       ;[ny, nx] = [y + vy, x + vx]
 
+      console.log(`${y} ${x}`)
+
       // Check if we will pass an edge
       var [sec, nSec] = [_.get(section, [y, x], 0), _.get(section, [ny, nx], 0)]
       if (sec !== nSec) {
@@ -175,6 +177,8 @@ const solve2 = ({ mapData, moveData, sections }) => {
 
         var [wy, wx] = [ny, nx]
         var nDirection = direction
+
+        console.log("leaving", sec, direction)
 
         if (sec === 5) {
           // if (direction === "R") {
@@ -348,7 +352,7 @@ const solve2 = ({ mapData, moveData, sections }) => {
             const [nSecXmin, nSecXmax] = secLimit[4][1]
 
             nDirection = "U"
-            wy = nSecYmin
+            wy = nSecYmax
             wx = nSecXmin + (y % secLen)
           }
 
@@ -404,7 +408,7 @@ const solve2 = ({ mapData, moveData, sections }) => {
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
- // < 96215
+// < 53324
 
-console.log("Sample:", [{ mapData: tryout[0], moveData: tryout[1], sections: tryout[2] }].map(solve2))
-// console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: data[2] }].map(solve2))
+// console.log("Sample:", [{ mapData: tryout[0], moveData: tryout[1], sections: tryout[2] }].map(solve2))
+console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: data[2] }].map(solve2))
