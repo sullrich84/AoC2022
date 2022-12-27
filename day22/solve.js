@@ -93,14 +93,11 @@ console.log("Task:", [{ mapData: data[0], moveData: data[1] }].map(solve1))
  *          ###############
  *          # 1    #
  *          #      #
- *          ########
- *          # 4    #
- *          #      #
+ *   ###############
+ *   # 2    # 4    #
+ *   #      #      #
  *   ###############
  *   # 2    #
- *   #      #
- *   ########
- *   # 3    #
  *   #      #
  *   ########
  */
@@ -141,7 +138,7 @@ const solve2 = ({ mapData, moveData, sections }) => {
       if (direction === "U") [vy, vx] = vUp
       ;[ny, nx] = [y + vy, x + vx]
 
-      // Check if we will pass an eded
+      // Check if we will pass an edge
       var [sec, nSec] = [_.get(section, [y, x], 0), _.get(section, [ny, nx], 0)]
       if (sec !== nSec) {
         const row = map[y]
