@@ -85,23 +85,6 @@ console.log("Task:", [{ mapData: data[0], moveData: data[1] }].map(solve1))
 
 /// Part 2
 
-/*
- * Sections:
- *          ###############
- *          # 5    # 6    #
- *          #      #      #
- *          ###############
- *          # 1    #
- *          #      #
- *   ###############
- *   # 2    # 4    #
- *   #      #      #
- *   ###############
- *   # 2    #
- *   #      #
- *   ########
- */
-
 const solve2 = ({ mapData, moveData, sections }) => {
   const map = mapData.map((row) => row.split(""))
   const section = sections.map((row) => row.split("").map((t) => parseInt(t) || 0))
@@ -167,30 +150,13 @@ const solve2 = ({ mapData, moveData, sections }) => {
       if (direction === "U") [vy, vx] = vUp
       ;[ny, nx] = [y + vy, x + vx]
 
-      console.log(`${y} ${x}`)
-
       // Check if we will pass an edge
       var [sec, nSec] = [_.get(section, [y, x], 0), _.get(section, [ny, nx], 0)]
       if (sec !== nSec) {
-        const row = map[y]
-        const col = map.map((r) => r[x])
-
         var [wy, wx] = [ny, nx]
         var nDirection = direction
 
-        console.log("leaving", sec, direction)
-
         if (sec === 5) {
-          // if (direction === "R") {
-          //   // Move to section 6L; no action
-          //   nDirection = "R"
-          // }
-
-          // if (direction === "D") {
-          //   // Move to section 1U; no action
-          //   nDirection = "D"
-          // }
-
           if (direction === "L") {
             // Warp to section 2L 180
             const [nSecYmin, nSecYmax] = secLimit[2][0]
@@ -233,11 +199,6 @@ const solve2 = ({ mapData, moveData, sections }) => {
             wx = nSecXmax
           }
 
-          // if (direction === "L") {
-          //   // Move to section 5R; no action
-          //   nDirection = "L"
-          // }
-
           if (direction === "U") {
             // Warp to section 3D 0
             const [nSecYmin, nSecYmax] = secLimit[3][0]
@@ -260,11 +221,6 @@ const solve2 = ({ mapData, moveData, sections }) => {
             wx = nSecXmin + (y % secLen)
           }
 
-          // if (direction === "D") {
-          //   // Move to section 4U; no action
-          //   nDirection = "D"
-          // }
-
           if (direction === "L") {
             // Warp to section 2U 90
             const [nSecYmin, nSecYmax] = secLimit[2][0]
@@ -274,11 +230,6 @@ const solve2 = ({ mapData, moveData, sections }) => {
             wy = nSecYmin
             wx = nSecXmin + (y % secLen)
           }
-
-          // if (direction === "U") {
-          //   // Move to section 5D; no action
-          //   nDirection = "U"
-          // }
         }
 
         if (sec === 4) {
@@ -301,29 +252,9 @@ const solve2 = ({ mapData, moveData, sections }) => {
             wy = nSecYmin + (x % secLen)
             wx = nSecXmax
           }
-
-          // if (direction === "L") {
-          //   // Move to section 2R; no action
-          //   nDirection = "L"
-          // }
-
-          // if (direction === "U") {
-          //   // Move to section 1D; no action
-          //   nDirection = "U"
-          // }
         }
 
         if (sec === 2) {
-          // if (direction === "R") {
-          //   // Move to section 4L; no action
-          //   nDirection = "R"
-          // }
-
-          // if (direction === "D") {
-          //   // Move to section 3U; no action
-          //   nDirection = "D"
-          // }
-
           if (direction === "L") {
             // Warp to section 5L 180
             const [nSecYmin, nSecYmax] = secLimit[5][0]
@@ -375,11 +306,6 @@ const solve2 = ({ mapData, moveData, sections }) => {
             wy = nSecYmin
             wx = nSecXmin + (y % secLen)
           }
-
-          // if (direction === "U") {
-          //   // Move to section 2D; no action
-          //   nDirection = "U"
-          // }
         }
 
         // Avoid warping into wall
@@ -408,7 +334,5 @@ const solve2 = ({ mapData, moveData, sections }) => {
   return [1000 * row, 4 * col, facing].reduce((acc, val) => acc + val, 0)
 }
 
-// < 53324
-
-// console.log("Sample:", [{ mapData: tryout[0], moveData: tryout[1], sections: tryout[2] }].map(solve2))
+console.log("Sample:", [{ mapData: tryout[0], moveData: tryout[1], sections: tryout[2] }].map(solve2))
 console.log("Task:", [{ mapData: data[0], moveData: data[1], sections: data[2] }].map(solve2))
