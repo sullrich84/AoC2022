@@ -19,15 +19,14 @@ const solve1 = ({ data }) => {
     const { flowRate, nodes } = valves[current]
     const currentRelease = (timeLeft - 1) * flowRate
 
-    for (const next of nodes) {
-      if (currentRelease != 0 && !opened.includes(current)) {
-        // Open current valve and move to next tunnel
-        const nextRelease = findMaxPressure(next, [...opened, current], timeLeft - 2)
-        best = _.max([best, currentRelease + nextRelease])
-      }
+    // Open current valve
+    if (currentRelease != 0 && !opened.includes(current)) {
+      const nextRelease = findMaxPressure(current, [...opened, current], timeLeft - 1)
+      best = Math.max(best, currentRelease + nextRelease)
+    }
 
-      // Ignore current valve and continue walking to the next tunnels
-      best = _.max([best, findMaxPressure(next, opened, timeLeft - 1)])
+    for (const next of nodes) {
+      best = Math.max(best, findMaxPressure(next, opened, timeLeft - 1))
     }
 
     cache[key] = best
