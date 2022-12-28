@@ -34,11 +34,11 @@ const solve1 = ({ data }) => {
     return best
   }
 
-  return findMaxPressure("AA", [], 26)
+  return findMaxPressure("AA", [], 30)
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
