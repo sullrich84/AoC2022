@@ -133,7 +133,5 @@ const solve2 = ({ data }) => {
   return findMaxPressure("AA", [], 26, true)
 }
 
-// >= 1659 should be 2382
-
 console.log("Sample:", [{ data: data }].map(solve2))
 // console.log("Task:", [{ data: data }].map(solve2))
