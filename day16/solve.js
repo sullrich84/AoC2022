@@ -7,7 +7,7 @@ console.log("🎄 Day 16")
 
 const solve1 = ({ data }) => {
   const valves = data
-  const cache = []
+  const cache = {}
 
   const findMaxPressure = (current, opened, timeLeft) => {
     if (timeLeft == 0) return 0
@@ -34,7 +34,7 @@ const solve1 = ({ data }) => {
     return best
   }
 
-  return findMaxPressure("AA", [], 30)
+  return findMaxPressure("AA", [], 26)
 }
 
 // console.log("Sample:", [{ data: sample }].map(solve1))
@@ -103,28 +103,28 @@ const solve2 = ({ data }) => {
   const cache = []
 
   const findMaxPressure = (current, opened, timeLeft, elephantIdle) => {
-    if (timeLeft == 0 && !elephantIdle) return 0
-    // Let the elephant run against the first runs best
-    if (timeLeft == 0 && elephantIdle) return findMaxPressure("AA", opened, 24, false)
-
-    const key = [current, opened, timeLeft, elephantIdle].join(":")
+    const key = [current, opened.join(), timeLeft, elephantIdle].join(":")
     if (key in cache) return cache[key]
+
+    if (timeLeft == 0 && !elephantIdle) return 0
+    if (timeLeft == 0 && elephantIdle) {
+      // Hacky optimization to avoid empty first runs
+      if (opened.length < 6) return 0
+      return findMaxPressure("AA", opened, 26, false)
+    }
 
     var best = 0
     const { flowRate, nodes } = valves[current]
-    const currentRelease = (timeLeft - 1) * flowRate
 
-    for (const next of nodes) {
-      if (currentRelease != 0 && !opened.includes(current)) {
-        // Open current valve and move to next tunnel
-        const openNextRelease = findMaxPressure(next, [...opened, current], timeLeft - 2, elephantIdle)
-        best = _.max([best, currentRelease + openNextRelease])
-      }
-
-      // Ignore current valve and continue walking to the next tunnels
-      const nextRelease = findMaxPressure(next, opened, timeLeft - 1, elephantIdle)
-      best = _.max([best, nextRelease])
+    if (flowRate > 0 && !opened.includes(current)) {
+      const nextOpen = [...opened, current]
+      const currentRelease = (timeLeft - 1) * flowRate
+      const openAndMove = findMaxPressure(current, nextOpen.sort(), timeLeft - 1, elephantIdle)
+      best = _.max([best, currentRelease + openAndMove])
     }
+
+    const noOpenAndMove = nodes.map((n) => findMaxPressure(n, opened, timeLeft - 1, elephantIdle))
+    var best = _.max(noOpenAndMove)
 
     cache[key] = best
     return best
@@ -135,5 +135,5 @@ const solve2 = ({ data }) => {
 
 // >= 1659 should be 2382
 
-console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: data }].map(solve2))
+// console.log("Task:", [{ data: data }].map(solve2))
