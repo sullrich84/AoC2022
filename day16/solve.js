@@ -52,7 +52,7 @@ const solve2 = ({ data, minValvesOpen }) => {
     if (timeLeft == 0 && !elephantIdle) return 0
     if (timeLeft == 0 && elephantIdle) {
       // Hacky optimization to avoid elephant cycles
-      // where no or too less valves has been opened
+      // where no or too few valves has been opened
       if (opened.length < minValvesOpen) return 0
       return findMaxPressure("AA", opened, 26, false)
     }
