@@ -3,13 +3,6 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 14: Regolith Reservoir")
 
-function drawMap(map) {
-  console.clear()
-  map.forEach((row) => {
-    console.log(row.join(""))
-  })
-}
-
 function pairwise(arr, func) {
   for (var i = 0; i < arr.length - 1; i++) {
     func(arr[i], arr[i + 1])
