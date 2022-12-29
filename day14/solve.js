@@ -86,7 +86,6 @@ const solve1 = (ctx) => {
     }
   }
 
-  // drawMap(map)
   return rest
 }
 
@@ -182,7 +181,6 @@ const solve2 = (ctx) => {
     }
   }
 
-  // drawMap(map)
   return rest
 }
 
