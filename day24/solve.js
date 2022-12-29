@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample, test } from "./data.js"
 
-console.log("🎄 Day 24")
+console.log("🎄 Day 24: Blizzard Basin")
 
 /// Part 1
 
@@ -97,7 +97,6 @@ const solve1 = ({ data }) => {
 
     if (distance == 0) {
       minSteps = Math.min(minSteps, steps)
-      console.log("Min:", minSteps)
       continue
     }
 
@@ -142,8 +141,8 @@ const solve1 = ({ data }) => {
   return minSteps
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
@@ -235,5 +234,5 @@ const solve2 = ({ data }) => {
   return minSteps
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve2))
+console.log("Sample:", [{ data: sample }].map(solve2))
 console.log("Task:", [{ data: data }].map(solve2))
