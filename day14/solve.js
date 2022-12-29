@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 14")
+console.log("🎄 Day 14: Regolith Reservoir")
 
 function drawMap(map) {
   console.clear()
@@ -97,10 +97,8 @@ const solve1 = (ctx) => {
   return rest
 }
 
-const sRes1 = [{ data: sample }].map(solve1)
-const res1 = [{ data: data }].map(solve1)
-
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
@@ -195,7 +193,5 @@ const solve2 = (ctx) => {
   return rest
 }
 
-const sRes2 = [{ data: sample }].map(solve2)
-const res2 = [{ data: data }].map(solve2)
-
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", [{ data: sample }].map(solve2))
+console.log("Task:", [{ data: data }].map(solve2))
