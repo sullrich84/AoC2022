@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 19")
+console.log("🎄 Day 19: Not Enough Minerals")
 
 /// Part 1
 
@@ -41,13 +41,6 @@ const solve = (bp, duration, id) => {
       obsidian + obsidianBots,
       geodes + geodeBots,
     ]
-
-    // Optimization: Only wait if we can't even produce one single robot
-
-    // Optimization: Skip states that will lead to an ore overflow
-    // if (ore >= timeleft * maxOre) {
-    //   continue
-    // }
 
     // GEODE ROBOT
     if (ore >= bp.geodeBot.ore && obsidian >= bp.geodeBot.obsidian) {
