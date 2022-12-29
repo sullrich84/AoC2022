@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 18")
+console.log("🎄 Day 18: Boiling Boulders")
 
 /// Part 1
 
@@ -20,7 +20,7 @@ const solve1 = ({ data }) => {
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-console.log( "Task:", [{ data: data }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
