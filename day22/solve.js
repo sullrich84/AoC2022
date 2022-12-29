@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample, tryout } from "./data.js"
 
-console.log("🎄 Day 22")
+console.log("🎄 Day 22: Monkey Map")
 
 /// Part 1
 const rotate = {
