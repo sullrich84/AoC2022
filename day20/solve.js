@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 20")
+console.log("🎄 Day 20: Grove Positioning System")
 
 const swap = (array, item) => {
   if (item.val === 0) return
@@ -31,10 +31,8 @@ const solve1 = ({ numbers }) => {
     .reduce((acc, val) => acc + val, 0)
 }
 
-const sRes1 = [{ numbers: sample }].map(solve1)
-const res1 = [{ numbers: data }].map(solve1)
-
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", [{ numbers: sample }].map(solve1))
+console.log("Task:", [{ numbers: data }].map(solve1))
 
 /// Part 2
 
@@ -54,7 +52,5 @@ const solve2 = ({ numbers }) => {
     .reduce((acc, val) => acc + val, 0)
 }
 
-const sRes2 = [{ numbers: sample }].map(solve2)
-const res2 = [{ numbers: data }].map(solve2)
-
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", [{ numbers: sample }].map(solve2))
+console.log("Task:", [{ numbers: data }].map(solve2))
