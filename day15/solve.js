@@ -33,10 +33,8 @@ const solve1 = (ctx) => {
   return min > max ? min - max : max - min
 }
 
-const sRes1 = [{ data: sample, target: 10 }].map(solve1)
-const res1 = [{ data: data, target: 2000000 }].map(solve1)
-
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", [{ data: sample, target: 10 }].map(solve1))
+console.log("Task:", [{ data: data, target: 2000000 }].map(solve1))
 
 /// Part 2
 
@@ -82,7 +80,5 @@ const solve2 = (ctx) => {
   }
 }
 
-const sRes2 = [{ data: sample, target: 20 }].map(solve2)
-const res2 = [{ data: data, target: 4000000 }].map(solve2)
-
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", [{ data: sample, target: 20 }].map(solve2))
+console.log("Task:", [{ data: data, target: 4000000 }].map(solve2))
