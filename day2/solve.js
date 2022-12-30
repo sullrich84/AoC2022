@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 2")
+console.log("🎄 Day 2: Rock Paper Scissors")
 
 const points = {
   rock: 1,
