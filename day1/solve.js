@@ -5,14 +5,14 @@ console.log("🎄 Day 1")
 
 /// Part 1
 
-const sRes1 = _.max(_.map(sample, _.sum))
-const res1 = _.max(_.map(data, _.sum))
+const solve1 = (data) => _.max(_.map(data, _.sum))
 
-console.log("Sample:", sRes1, "Task:", res1)
+console.log("Sample:", solve1(sample))
+console.log("Task:", solve1(data))
 
 /// Part 2
 
-const sRes2 = _.sum(_.take(_.sortBy(_.map(sample, _.sum)).reverse(), 3))
-const res2 = _.sum(_.take(_.sortBy(_.map(data, _.sum)).reverse(), 3))
+const solve2 = (data) => _.sum(_.take(_.sortBy(_.map(data, _.sum)).reverse(), 3))
 
-console.log("Sample:", sRes2, "Task:", res2)
+console.log("Sample:", solve2(sample))
+console.log("Task:", solve2(data))
