@@ -2,7 +2,7 @@ import _ from "lodash"
 import data, { sample } from "./data.js"
 import Graph from "node-dijkstra"
 
-console.log("🎄 Day 12")
+console.log("🎄 Day 12: Hill Climbing Algorithm")
 
 /// Part 1
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
