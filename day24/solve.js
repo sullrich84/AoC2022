@@ -74,6 +74,49 @@ const buildMap = (grid, [py, px], blizzards) => {
   return map
 }
 
+const buildBlizzardStates = (data) => {
+  // left, right, up, down
+  const blizzards = [[], [], [], []]
+
+  // Build groups of blizzards directions
+  for (const [y, row] of data.entries()) {
+    const chars = row.split("")
+    for (const [x, char] of chars.entries()) {
+      const bt = "<>^v".indexOf(char)
+      if (bt !== -1) blizzards[bt].push([y, x])
+    }
+  }
+
+  const height = data.length
+  const width = data[0].length
+
+  var initialState = JSON.stringify(blizzards)
+  var blizzardStates = [blizzards]
+
+  // Find repeating pattern for blizzards
+  while (true) {
+    const prev = blizzardStates.at(-1)
+    const curr = [[], [], [], []]
+
+    for (const [dir, dirBlizzards] of prev.entries()) {
+      const [vy, vx] = vectors[dir]
+      for (const [by, bx] of dirBlizzards) {
+        var [ny, nx] = [by + vy, bx + vx]
+        if (ny === 0) ny = height - 2
+        if (ny === height - 1) ny = 1
+        if (nx === 0) nx = width - 2
+        if (nx === width - 1) nx = 1
+        curr[dir].push([ny, nx])
+      }
+    }
+
+    if (initialState === JSON.stringify(curr)) break
+    blizzardStates.push(curr)
+  }
+
+  return blizzardStates.map((s) => _.flatten(s))
+}
+
 const solve1 = ({ data }) => {
   const initialBlizzards = parseBlizzards(data)
   const grid = parseGrid(data)
@@ -141,7 +184,7 @@ const solve1 = ({ data }) => {
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
+// console.log("Sample:", [{ data: sample }].map(solve1))
 console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
@@ -234,5 +277,5 @@ const solve2 = ({ data }) => {
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve2))
-console.log("Task:", [{ data: data }].map(solve2))
+// console.log("Sample:", [{ data: sample }].map(solve2))
+// console.log("Task:", [{ data: data }].map(solve2))
