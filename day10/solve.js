@@ -1,7 +1,7 @@
 import _ from "lodash"
 import data, { sample } from "./data.js"
 
-console.log("🎄 Day 10")
+console.log("🎄 Day 10: Cathode-Ray Tube")
 
 /// Part 1
 
