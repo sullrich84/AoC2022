@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { dStack, dMap, sStack, sMap } from "./data.js"
 
-console.log("🎄 Day 5")
+console.log("🎄 Day 5: Supply Stacks")
 
 /// Part 1
 
