@@ -1,5 +1,6 @@
 import _ from "lodash"
-import data, { sample, test } from "./data.js"
+import * as math from "mathjs"
+import data, { sample } from "./data.js"
 
 console.log("🎄 Day 24: Blizzard Basin")
 
@@ -76,9 +77,9 @@ const buildMap = (grid, [py, px], blizzards) => {
 
 const vectors = [
   [0, -1], // left
-  [0, 1], // right
+  [0, +1], // right
   [-1, 0], // up
-  [1, 0], // down
+  [+1, 0], // down
 ]
 
 const buildBlizzardStates = (data) => {
@@ -121,16 +122,23 @@ const buildBlizzardStates = (data) => {
     blizzardStates.push(curr)
   }
 
-  return blizzardStates.map((s) => _.flatten(s))
+  return blizzardStates
+    .map((s) => _.flatten(s))
+    .map((state) => {
+      var mStates = _.times(height, () => _.times(width, () => 0))
+      state.forEach(([y, x]) => {
+        mStates[y][x] = mStates[y][x] + 1
+      })
+      return mStates
+    })
 }
 
 const solve1 = ({ data }) => {
   const blizzardStates = buildBlizzardStates(data)
+  const grid = parseGrid(data)
+
   const height = data.length
   const width = data[0].length
-
-  const initialBlizzards = parseBlizzards(data)
-  const grid = parseGrid(data)
 
   const start = [0, 1]
   const finish = [grid.length - 1, grid[0].length - 2]
@@ -139,19 +147,19 @@ const solve1 = ({ data }) => {
   const seen = {}
 
   var minSteps = Number.POSITIVE_INFINITY
-  var maxSteps = 330
 
-  stack.push([[0, 1], 0])
+  stack.push([start, 0])
 
   while (stack.length > 0) {
-    const [player, steps] = stack.pop()
+    const [player, steps] = stack.shift()
     const [py, px] = [...player]
 
     const key = [steps, py, px].join(":")
     if (key in seen) continue
     seen[key] = true
 
-    const blizzards = blizzardStates[steps % blizzardStates.length]
+    const currBlizzState = blizzardStates[steps % blizzardStates.length]
+    const nextBlizzState = blizzardStates[(steps + 1) % blizzardStates.length]
     const distance = Math.abs(py - finish[0]) + Math.abs(px - finish[1])
 
     if (distance == 0) {
@@ -160,30 +168,33 @@ const solve1 = ({ data }) => {
     }
 
     // Dead end
-    if (steps + distance >= minSteps || steps + distance >= maxSteps) continue
-    if (blizzards.find(([y, x]) => y == py && px == x)) continue
+    if (steps + distance >= minSteps) continue
+    if (currBlizzState[py][px] !== 0) debugger
+
+    // Wait for one round
+    if (nextBlizzState[py][px] === 0) {
+      stack.push([[py, px], steps + 1])
+    }
 
     directions: for (const [vy, vx] of vectors) {
       var [npy, npx] = [py + vy, px + vx]
-    
-      // One step before target
-      if (npy === finish[0] - 1 && npx === finish[1]) {
-        stack.push([[npy + 1, npx, steps + 1]])
-        continue
+      var tile = _.get(grid, [npy, npx], "#")
+
+      if (tile === "#" || !_.inRange(npy, 0, height) || !_.inRange(npx, 0, width) || nextBlizzState[npy][npx] !== 0) {
+        continue directions
       }
 
-      if (npy === 0 || npy === height - 1 || npx === 0 || npx === width - 2) continue directions
-      stack.push([[npy, npx, steps + 1]])
+      stack.push([[npy, npx], steps + 1])
     }
 
-    // Wait for one round
-    stack.push([[py, px], steps + 1])
+    // Sort the stack to have the most promising state on top
+    stack.sort(([[py, px], steps]) => steps + Math.abs(py - finish[0]) + Math.abs(px - finish[1]))
   }
 
   return minSteps
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
 console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
@@ -275,5 +286,5 @@ const solve2 = ({ data }) => {
   return minSteps
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve2))
+console.log("Sample:", [{ data: sample }].map(solve2))
+console.log("Task:", [{ data: data }].map(solve2))
