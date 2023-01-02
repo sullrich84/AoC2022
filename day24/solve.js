@@ -1,5 +1,5 @@
 import _ from "lodash"
-import * as math from "mathjs"
+import Heap from "collections/heap.js"
 import data, { sample } from "./data.js"
 
 console.log("🎄 Day 24: Blizzard Basin")
@@ -82,6 +82,10 @@ const vectors = [
   [+1, 0], // down
 ]
 
+const calcDist = ([ay, ax], [by, bx]) => {
+  return Math.abs(ay - by) + Math.abs(ax - bx)
+}
+
 const buildBlizzardStates = (data) => {
   // left, right, up, down
   const blizzards = [[], [], [], []]
@@ -144,10 +148,10 @@ const solve1 = ({ data }) => {
   const finish = [grid.length - 1, grid[0].length - 2]
 
   const stack = []
-  const seen = {}
+  const seen = new Set()
 
   var minSteps = Number.POSITIVE_INFINITY
-
+  
   stack.push([start, 0])
 
   while (stack.length > 0) {
@@ -155,12 +159,12 @@ const solve1 = ({ data }) => {
     const [py, px] = [...player]
 
     const key = [steps, py, px].join(":")
-    if (key in seen) continue
-    seen[key] = true
+    if (seen.has(key)) continue
+    seen.add(key)
 
     const currBlizzState = blizzardStates[steps % blizzardStates.length]
     const nextBlizzState = blizzardStates[(steps + 1) % blizzardStates.length]
-    const distance = Math.abs(py - finish[0]) + Math.abs(px - finish[1])
+    const distance = calcDist([py, px], finish)
 
     if (distance == 0) {
       minSteps = Math.min(minSteps, steps)
@@ -194,7 +198,7 @@ const solve1 = ({ data }) => {
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
+// console.log("Sample:", [{ data: sample }].map(solve1))
 console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
@@ -286,5 +290,5 @@ const solve2 = ({ data }) => {
   return minSteps
 }
 
-console.log("Sample:", [{ data: sample }].map(solve2))
-console.log("Task:", [{ data: data }].map(solve2))
+// console.log("Sample:", [{ data: sample }].map(solve2))
+// console.log("Task:", [{ data: data }].map(solve2))
