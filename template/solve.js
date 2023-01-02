@@ -6,7 +6,6 @@ console.log("🎄 Day X")
 /// Part 1
 
 const solve1 = ({ data }) => {
-  console.log(data)
   return 0
 }
 
@@ -15,10 +14,9 @@ console.log("Sample:", [{ data: sample }].map(solve1))
 
 /// Part 2
 
-const solve2 = (input) => {
-  console.log(input)
+const solve2 = ({ data }) => {
   return 0
 }
 
-console.log("Sample:", [{ data: sample }].map(solve2))
-console.log("Task:", [{ data: data }].map(solve2))
+// console.log("Sample:", [{ data: sample }].map(solve2))
+// console.log("Task:", [{ data: data }].map(solve2))
