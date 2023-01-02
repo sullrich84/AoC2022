@@ -1,0 +1,17 @@
+{
+  "name": "advent-of-code-2021",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Sebastian Ullrich",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "scripts": {
+    "day3": "node day2/solve.js",
+    "day2": "node day2/solve.js",
+    "day1": "node day1/solve.js"
+  }
+}
