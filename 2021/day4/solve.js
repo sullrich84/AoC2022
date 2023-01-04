@@ -95,5 +95,5 @@ const solve2 = ({ selects, boards }) => {
   return _.tail(finalScores)
 }
 
-console.log("Sample:", [{ selects: _.head(sample), boards: _.tail(sample) }].map(solve1))
-console.log("Task:", [{ selects: _.head(data), boards: _.tail(data) }].map(solve1))
+console.log("Sample:", [{ selects: _.head(sample), boards: _.tail(sample) }].map(solve2))
+console.log("Task:", [{ selects: _.head(data), boards: _.tail(data) }].map(solve2))
