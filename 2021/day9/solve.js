@@ -53,7 +53,7 @@ const solve2 = ({ data }) => {
 
         if (key in cache || height >= 9 || pHeight >= height) continue
         cache[key] = true
-        
+       
         basin.push(height)
         for (const [ly, lx] of locations) stack.push([ly + y, lx + x])
       }
