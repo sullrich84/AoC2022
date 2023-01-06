@@ -26,8 +26,7 @@ const solve1 = ({ data }) => {
         continue lc
       }
 
-      const expected = close[start.indexOf(_.last(stack))]
-      console.log(`Expected '${expected}' but found '${char}' instead.`)
+      // Sequence is corrupted
       errorScore += points[close.indexOf(char)]
       continue ll
     }
@@ -36,17 +35,18 @@ const solve1 = ({ data }) => {
   return errorScore
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
 const solve2 = ({ data }) => {
-  const wait = []
-  const seen = []
   const score = []
 
   ll: for (const line of data) {
+    const wait = []
+    const seen = []
+
     lc: for (const char of line) {
       if (start.includes(char)) {
         seen.push(char)
@@ -59,17 +59,19 @@ const solve2 = ({ data }) => {
         wait.shift()
         continue lc
       }
+
+      // Sequence is corrupted
+      wait.length = 0
+      break lc
     }
 
-    if (wait.length > 0) {
-      console.log(`Complete by adding ${wait.join("")}`)
-      score.push(wait.map((c) => close.indexOf(c) + 1).reduce((p, c) => p * 5 + c, 0))
-      wait.length = 0
-    }
+    if (wait.length === 0) continue ll
+    score.push(wait.map((c) => close.indexOf(c) + 1).reduce((p, c) => p * 5 + c, 0))
   }
 
-  return score 
+  score.sort((a, b) => b - a)
+  return score[Math.floor(score.length / 2)]
 }
 
 console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve2))
+console.log("Task:", [{ data: data }].map(solve2))
