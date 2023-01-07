@@ -10,6 +10,7 @@
     "lodash": "^4.17.21"
   },
   "scripts": {
+    "day12": "node day12/solve.js",
     "day11": "node day11/solve.js",
     "day10": "node day10/solve.js",
     "day9": "node day9/solve.js",
