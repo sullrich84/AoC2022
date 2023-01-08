@@ -68,28 +68,21 @@ const solve2 = ({ data }) => {
     const [path, seen] = stack.pop()
     const pos = _.last(path)
 
-    const pKey = path.join()
-    const sKey = seen.join()
-    const key = pKey + ":" + sKey
+    const key = path.join()
     if (key in cache) continue loop
     cache[key] = true
 
     // Skip branch if two or more tiny cave has been visited
-    const sSeen = seen.filter((e) => e === e.toLowerCase())
-    if (sSeen.length - _.uniq(sSeen).length > 1) continue loop
+    if (seen.length - _.uniq(seen).length > 1) continue loop
 
     if (pos === "end") {
-      ways.push(pKey)
+      ways.push(key)
       continue loop
     }
 
     adj: for (const adj of map[pos]) {
       if (adj === "start") continue adj
-
-      stack.push([
-        [...path, adj],
-        [...seen, pos],
-      ])
+      stack.push([[...path, adj], pos === pos.toLowerCase() ? [...seen, pos] : seen])
     }
   }
 
