@@ -1,7 +1,11 @@
 import _ from "lodash"
-import data, { sample, smallSample } from "./data.js"
+import data, { sample } from "./data.js"
 
 console.log("🎄 Day 12: Passage Pathing")
+
+String.prototype.isSmallCave = function () {
+  return this === this.toLowerCase()
+}
 
 const buildMap = (data) => {
   const map = {}
@@ -36,12 +40,12 @@ const solve1 = ({ data }) => {
     cache[key] = true
 
     if (pos === "end") {
-      ways.add(pKey)
+      ways.push(pKey)
       continue loop
     }
 
     adj: for (const adj of map[pos]) {
-      if (adj === adj.toLowerCase() && seen.includes(adj)) continue adj
+      if (adj.isSmallCave() && seen.includes(adj)) continue adj
       stack.push([
         [...path, adj],
         [...seen, pos],
@@ -49,11 +53,11 @@ const solve1 = ({ data }) => {
     }
   }
 
-  return ways.size
+  return ways.length
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
@@ -82,7 +86,7 @@ const solve2 = ({ data }) => {
 
     adj: for (const adj of map[pos]) {
       if (adj === "start") continue adj
-      stack.push([[...path, adj], pos === pos.toLowerCase() ? [...seen, pos] : seen])
+      stack.push([[...path, adj], pos.isSmallCave() ? [...seen, pos] : seen])
     }
   }
 
