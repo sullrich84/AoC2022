@@ -38,10 +38,7 @@ const solve = ({ template, insertions, steps }) => {
 
   // Edge elements are 1 off
   const val = Object.keys(e1).map((k) => _.max([e1[k], e2[k]]))
-
-  const max = _.max(val)
-  const min = _.min(val)
-  return max - min
+  return _.max(val) - _.min(val)
 }
 
 /// Part 1
