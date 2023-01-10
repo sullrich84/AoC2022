@@ -23,29 +23,29 @@ const solve1 = ({ data }) => {
   const visited = {}
 
   var minRisk = Number.POSITIVE_INFINITY
-  stack.push([start, finish, 0])
+  stack.push([start, 0])
 
-  dfs: while (stack.length > 0) {
-    const [[py, px], [dy, dx], risk] = stack.pop()
+  bfs: while (stack.length > 0) {
+    const [[py, px], risk] = stack.pop()
 
     const key = [py, px].join()
-    if (key in visited) continue dfs
+    if (key in visited) continue bfs
     visited[key] = risk
 
-    if (py === dy && px === dx) {
+    if (py === finish[0] && px === finish[1]) {
       minRisk = risk
-      break dfs
+      break bfs
     }
 
     dirs: for (const [y, x] of dirs) {
       const [ny, nx] = [py + y, px + x]
       const nRisk = _.get(data, [ny, nx], null)
       if (nRisk === null) continue dirs
-      stack.push([[ny, nx], [dy, dx], risk + nRisk])
+      stack.push([[ny, nx], risk + nRisk])
     }
 
     // Priorize by sorting risk descending (lowest risk last)
-    stack.sort((a, b) => b[2] - a[2])
+    stack.sort((a, b) => b[1] - a[1])
   }
 
   return minRisk
