@@ -25,16 +25,16 @@ const solve1 = ({ data }) => {
   var minRisk = Number.POSITIVE_INFINITY
   stack.push([start, finish, 0])
 
-  loop: while (stack.length > 0) {
+  dfs: while (stack.length > 0) {
     const [[py, px], [dy, dx], risk] = stack.pop()
 
     const key = [py, px].join()
-    if (key in visited) continue loop
+    if (key in visited) continue dfs
     visited[key] = risk
 
     if (py === dy && px === dx) {
       minRisk = risk
-      break loop
+      break dfs
     }
 
     dirs: for (const [y, x] of dirs) {
