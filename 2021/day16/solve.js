@@ -3,10 +3,18 @@ import data, { sample } from "./data.js"
 
 console.log("🎄 Day 16: Packet Decoder")
 
+String.prototype.toBinary = function (size = 4) {
+  return _.padStart(parseInt(this, 16).toString(2), size, 0)
+}
+
 /// Part 1
 
 const solve1 = ({ data }) => {
-  return parseInt("F", 16)
+  const binary = _.flatten(data.map((e) => e.toString().toBinary().split("")))
+
+  
+
+  return binary
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))

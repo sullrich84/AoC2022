@@ -1393,4 +1393,4 @@ export default [
   8,
 ]
 
-export const sample = []
+export const sample = [8, "A", 0, 0, 4, "A", 8, 0, 1, "A", 8, 0, 0, 2, "F", 4, 7, 8]
