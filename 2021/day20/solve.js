@@ -22,11 +22,11 @@ const dirs = [
 ]
 
 const solve1 = ([input, map], loops) => {
-  const off = 50
+  const off = 10
   var result = []
   var thisMap = [...map]
 
-  for (var loop = 0; loop < loops; loop++) {
+  for (var loop = 1; loop <= loops; loop++) {
     const size = thisMap.length
     const nextMap = _.times(size + 2 * off, () => [])
 
@@ -38,15 +38,14 @@ const solve1 = ([input, map], loops) => {
           .join("")
         const binary = parseInt(binaryString, 2)
 
-        if (binary === 0) nextMap[ny].push(0)
-        else nextMap[ny].push(input[binary])
+        nextMap[ny].push(input[binary])
       }
     }
 
     thisMap = result = nextMap
   }
 
-  // result.forEach((row) => console.log(row.join("").replaceAll("0", ".").replaceAll("1", "#")))
+  result.forEach((row) => console.log(row.join("").replaceAll("0", ".").replaceAll("1", "#")))
   return _.sum(_.flatten(result))
 }
 
