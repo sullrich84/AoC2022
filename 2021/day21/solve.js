@@ -32,7 +32,6 @@ const solve1 = ([startP1, startP2]) => {
       const moves = [nextDie(++rolls), nextDie(++rolls), nextDie(++rolls)]
       players[player].pos = nextPos(players[player].pos, _.sum(moves))
       players[player].score += players[player].pos
-      console.log(`${player} moved with ${moves} to position ${players[player].pos} (score ${players[player].score})`)
       if (players[player].score >= 1000) break game
     }
   }
