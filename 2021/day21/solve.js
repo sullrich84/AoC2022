@@ -5,16 +5,16 @@ console.log("🎄 Day 21: Dirac Dice")
 
 /// Part 1
 
-const nextDie = (roll) => {
-  return ((roll - 1) % 100) + 1
-}
-
-const nextPos = (pos, moves) => {
-  return ((pos + moves - 1) % 10) + 1
-}
-
 const solve1 = ([startP1, startP2]) => {
   var rolls = 0
+
+  const nextDie = (roll) => {
+    return ((roll - 1) % 100) + 1
+  }
+
+  const nextPos = (pos, moves) => {
+    return ((pos + moves - 1) % 10) + 1
+  }
 
   const players = {
     player1: {
@@ -39,14 +39,26 @@ const solve1 = ([startP1, startP2]) => {
   return Math.min(players.player1.score, players.player2.score) * rolls
 }
 
-console.log("Sample:", solve1(sample))
-console.log("Task:", solve1(data))
+// console.log("Sample:", solve1(sample))
+// console.log("Task:", solve1(data))
 
 /// Part 2
 
-const solve2 = ({ data }) => {
+const solve2 = ([startP1, startP2]) => {
+  const rolls = []
+
+  stack = []
+  stack.push([
+    [startP1, 0, 0],
+    [startP2, 0, 0],
+  ])
+
+  // while (stack.length > 0) {
+  // const [pos, score, ]
+  // }
+
   return 0
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve2))
+console.log("Sample:", solve2(sample))
+// console.log("Task:", solve2(data))
