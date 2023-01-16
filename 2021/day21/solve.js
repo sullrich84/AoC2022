@@ -17,18 +17,12 @@ const solve1 = ([startP1, startP2]) => {
   }
 
   const players = {
-    player1: {
-      score: 0,
-      pos: startP1,
-    },
-    player2: {
-      score: 0,
-      pos: startP2,
-    },
+    p1: { score: 0, pos: startP1 },
+    p2: { score: 0, pos: startP2 },
   }
 
   game: while (true) {
-    for (const player of ["player1", "player2"]) {
+    for (const player of ["p1", "p2"]) {
       const moves = [nextDie(++rolls), nextDie(++rolls), nextDie(++rolls)]
       players[player].pos = nextPos(players[player].pos, _.sum(moves))
       players[player].score += players[player].pos
@@ -36,7 +30,7 @@ const solve1 = ([startP1, startP2]) => {
     }
   }
 
-  return Math.min(players.player1.score, players.player2.score) * rolls
+  return Math.min(players.p1.score, players.p2.score) * rolls
 }
 
 // console.log("Sample:", solve1(sample))
@@ -47,15 +41,65 @@ const solve1 = ([startP1, startP2]) => {
 const solve2 = ([startP1, startP2]) => {
   const rolls = []
 
-  stack = []
-  stack.push([
-    [startP1, 0, 0],
-    [startP2, 0, 0],
-  ])
+  for (const r1 of [1, 2, 3]) {
+    for (const r2 of [1, 2, 3]) {
+      for (const r3 of [1, 2, 3]) {
+        rolls.push(r1 + r2 + r3)
+      }
+    }
+  }
 
-  // while (stack.length > 0) {
-  // const [pos, score, ]
-  // }
+  const cache = {}
+  const stack = []
+  stack.push({
+    p1: { score: 0, pos: startP1 },
+    p2: { score: 0, pos: startP2 },
+    turn: 0,
+  })
+
+  const wins = { p1: 0, p2: 0 }
+
+  stack: while (stack.length > 0) {
+    const { p1, p2, turn } = stack.pop()
+
+    const key = JSON.stringify({ p1, p2, turn })
+    if (key in cache) {
+      if (cache[key] === 0) {
+        wins.p1 += 1
+      } else {
+        wins.p2 += 1
+      }
+      continue stack
+    }
+
+    if (p1.score >= 21) {
+      wins.p1 += 1
+      cache[key] = 0
+      continue stack
+    }
+
+    if (p2.score >= 21) {
+      wins.p2 += 1
+      cache[key] = 1
+      continue stack
+    }
+
+    if (turn === 0) {
+      // Turn: Player 1
+      for (const r of rolls) {
+        const pos = ((p1.pos + r - 1) % 10) + 1
+        const score = p1.pos + p1.score
+        stack.push({ p1: { score, pos }, p2, turn: 1 })
+      }
+    } else {
+      // Turn: Player 2
+      for (const r of rolls) {
+        const pos = ((p2.pos + r - 1) % 10) + 1
+        const score = p2.pos + p2.score
+        stack.push({ p1, p2: { score, pos }, turn: 0 })
+      }
+    }
+  }
 
   return 0
 }
