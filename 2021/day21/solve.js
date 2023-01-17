@@ -62,7 +62,7 @@ const solve2 = ([startP1, startP2]) => {
   stack: while (stack.length > 0) {
     const { p1, p2, turn } = stack.pop()
 
-    const key = JSON.stringify({ p1, p2, turn })
+    const key = [p1.score, p1.pos, p2.score, p2.pos, turn].join()
     if (key in cache) {
       if (cache[key] === 0) {
         wins.p1 += 1
