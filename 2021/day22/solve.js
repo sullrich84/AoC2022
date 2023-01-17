@@ -17,11 +17,8 @@ const solve1 = ({ data }) => {
       for (var y = ys; y <= ye; y++) {
         for (var z = zs; z <= ze; z++) {
           const key = [x, y, z].join(":")
-          if (active) {
-            grid.add(key)
-          } else {
-            grid.delete(key)
-          }
+          if (active) grid.add(key)
+          else grid.delete(key)
         }
       }
     }
