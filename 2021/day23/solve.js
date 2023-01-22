@@ -73,17 +73,28 @@ const solve1 = ({ data }) => {
     const [players, energy] = stack.pop()
     const [p1, p2, p3, p4, p5, p6, p7, p8] = players
 
-    for (const [y, x, t] of players) {
-      if (
-        (y === rules[t].dest[0][0] && x === rules[t].dest[0][1]) ||
-        (y === rules[t].dest[1][0] && x === rules[t].dest[1][1])
-      ) {
-        // Cell is at it
-        continue
+    // Skip inefficient branches
+    if (energy > minEnergy) continue
+
+    const movingPlayers = []
+    players: for (const player of players) {
+      const [y, x, t] = player
+      const [[d1y, d1x], [d2y, d2x]] = rules[t].dest
+
+      // Amphipod is at bottom in its destination room
+      if (x === d2x && y === d2y) continue players
+
+      // Amphipod is at top in its destionation room
+      // and is not blocking any foreign amphipod
+      const lower = players.find(([y, x, pt]) => y === d1y && x === d1x && pt === t)
+      if (x === d1x && y === d1y && lower) continue players
+
+      dirs: for (const [dy, dx] of dirs) {
+        
       }
     }
 
-    if (energy > minEnergy) continue
+    // Move the amphipods
   }
 }
 
