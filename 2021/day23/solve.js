@@ -15,7 +15,6 @@ const noStop = [
 const rules = {
   A: {
     energy: 1,
-    destX: 3,
     dest: [
       [2, 3],
       [3, 3],
@@ -23,7 +22,6 @@ const rules = {
   },
   B: {
     energy: 10,
-    destX: 5,
     dest: [
       [2, 5],
       [3, 5],
@@ -31,7 +29,6 @@ const rules = {
   },
   C: {
     energy: 100,
-    destX: 7,
     dest: [
       [2, 7],
       [3, 7],
@@ -39,7 +36,6 @@ const rules = {
   },
   D: {
     energy: 1000,
-    destX: 9,
     dest: [
       [2, 9],
       [3, 9],
@@ -110,20 +106,20 @@ const solve1 = ({ data }) => {
       const [[d1y, d1x], [d2y, d2x]] = rules[t].dest
 
       // Amphipod is at bottom in its destination room
-      if (x === d2x && y === d2y) continue players
+      if (y === d2y && x === d2x) continue players
 
       // Amphipod is at top in its destionation room
       // and is not blocking any foreign amphipod
       const lower = Object.values(players).find(([y, x, pt]) => y === d1y && x === d1x && pt === t)
-      if (x === d1x && y === d1y && lower) continue players
+      if (y === d1y && x === d1x && lower) continue players
 
-      const hallway = players.filter(([y]) => y === 1)
+      const hallway = Object.values(players).filter(([y]) => y === 1)
 
       if (y > 1) {
         // Move amphipod to possible left waiting spots in hallway
         const leftWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx < x).reverse()
         left: for (const [ny, nx] of leftWaitingSpots) {
-          if (!!hallway.find(([_hy, hx]) => hx === nx)) break left
+          if (hallway.find(([_hy, hx]) => hx === nx) !== undefined) break left
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
           movingPlayers.push([{ ...players, ...next }, nextEnergy])
@@ -132,20 +128,53 @@ const solve1 = ({ data }) => {
         // Move amphipod to possible right waiting spots in hallway
         const rightWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx > x)
         right: for (const [ny, nx] of rightWaitingSpots) {
-          if (!!hallway.find(([_hy, hx]) => hx === nx)) break right
+          if (hallway.find(([_hy, hx]) => hx === nx) !== undefined) break right
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
           movingPlayers.push([{ ...players, ...next }, nextEnergy])
         }
       } else {
         // Move amphipod to destination room
-        const occupiers = players.filter(([oy, ox]) => oy === d1y && (ox === d1x || ox === d2x))
+        const blocked = Object.values(players).find(([by, bx]) => by === y && bx > x && bx < d1x + 1)
+        if (blocked) continue // Way to room blocked
+
+        const occupiers = Object.values(players).filter(([oy, ox]) => oy === d1y && (ox === d1x || ox === d2x))
+        if (occupiers.find(([_oy, _ox, ot]) => ot !== t) !== undefined) continue // Room not enterable
+
+        if (
+          occupiers.find(([oy, ox]) => oy === d1y && ox === d1x) === undefined &&
+          occupiers.find(([oy, ox]) => oy === d2y && ox === d2x) === undefined
+        ) {
+          // Move to bottom position in destination room
+          const next = { [key]: [d2y, d2x, t] }
+          const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
+          movingPlayers.push([{ ...players, ...next }, nextEnergy])
+        }
+
+        if (
+          occupiers.find(([oy, ox]) => oy === d1y && ox === d1x) === undefined &&
+          occupiers.find(([oy, ox]) => oy === d2y && ox === d2x) !== undefined
+        ) {
+          // Move to top position in destination room
+          const next = { [key]: [d1y, d1x, t] }
+          const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
+          movingPlayers.push([{ ...players, ...next }, nextEnergy])
+        }
       }
     }
 
     if (movingPlayers.length === 0) {
+      const destA = Object.values(players).filter(([y, x, t]) => t === "A" && y > 1 && x === 3)
+      const destB = Object.values(players).filter(([y, x, t]) => t === "B" && y > 1 && x === 5)
+      const destC = Object.values(players).filter(([y, x, t]) => t === "C" && y > 1 && x === 7)
+      const destD = Object.values(players).filter(([y, x, t]) => t === "D" && y > 1 && x === 9)
+
+      if (destA.length + destB.length + destC.length + destD.length !== 8) {
+        // Broken configuration
+        continue
+      }
+
       minEnergy = Math.min(minEnergy, energy)
-      continue
     }
 
     // Move the amphipods
