@@ -86,10 +86,10 @@ const solve1 = ({ data }) => {
     p8: [3, 9, _.get(data, [3, 9])],
   }
 
-  stack.push([players, 0])
+  stack.push([players, 0, ["game start"]])
 
   while (stack.length > 0) {
-    const [players, energy] = stack.pop()
+    const [players, energy, history] = stack.pop()
     const debugMap = debug(players)
 
     const key = JSON.stringify([players, energy])
@@ -119,7 +119,11 @@ const solve1 = ({ data }) => {
           if (findValue(players, ([y, x]) => y === ny && x === nx)) break left
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
+          movingPlayers.push([
+            { ...players, ...next },
+            energy + nextEnergy,
+            [...history, `${t} from (${y},${x}) to (${ny},${nx}) energy: ${nextEnergy}`],
+          ])
         }
 
         // Move amphipod to possible right waiting spots in hallway
@@ -128,7 +132,11 @@ const solve1 = ({ data }) => {
           if (findValue(players, ([y, x]) => y === ny && x === nx)) break right
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
+          movingPlayers.push([
+            { ...players, ...next },
+            energy + nextEnergy,
+            [...history, `${t} from (${y},${x}) to (${ny},${nx}) energy: ${nextEnergy}`],
+          ])
         }
       } else {
         // Move amphipod to destination room
@@ -145,12 +153,20 @@ const solve1 = ({ data }) => {
           // Move to bottom position in destination room
           const next = { [key]: [d2y, d2x, t] }
           const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
+          movingPlayers.push([
+            { ...players, ...next },
+            energy + nextEnergy,
+            [...history, `${t} from (${y},${x}) to (${d2y},${d2x}) energy: ${nextEnergy}`],
+          ])
         } else if (rm1 === undefined && rm2 !== undefined) {
           // Move to top position in destination room
           const next = { [key]: [d1y, d1x, t] }
           const nextEnergy = (Math.abs(y - d1y) + Math.abs(x - d1x)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
+          movingPlayers.push([
+            { ...players, ...next },
+            energy + nextEnergy,
+            [...history, `${t} from (${y},${x}) to (${d1y},${d1x}) energy: ${nextEnergy}`],
+          ])
         }
       }
     }
