@@ -5,13 +5,6 @@ console.log("🎄 Day 23: Amphipod")
 
 /// Part 1
 
-const noStop = [
-  [1, 3],
-  [1, 5],
-  [1, 7],
-  [1, 9],
-]
-
 const rules = {
   A: {
     energy: 1,
@@ -43,24 +36,6 @@ const rules = {
   },
 }
 
-const tiles = [
-  [1, 1],
-  [1, 2],
-  [1, 3],
-  [1, 4],
-  [1, 5],
-  [1, 6],
-  [1, 7],
-  [1, 8],
-  [1, 9],
-  [1, 10],
-  [1, 11],
-  ...rules.A.dest,
-  ...rules.B.dest,
-  ...rules.C.dest,
-  ...rules.D.dest,
-]
-
 const waitingSpots = [
   [1, 1],
   [1, 2],
@@ -70,6 +45,29 @@ const waitingSpots = [
   [1, 10],
   [1, 11],
 ]
+
+const debug = (players) => {
+  const map = [
+    ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
+    ["#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#"],
+    ["#", "#", "#", ".", "#", ".", "#", ".", "#", ".", "#", "#", "#"],
+    ["#", "#", "#", ".", "#", ".", "#", ".", "#", ".", "#", "#", "#"],
+    ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
+  ]
+
+  return map.map((row, y) =>
+    row
+      .map((tile, x) => {
+        const p = Object.values(players).find(([py, px]) => py === y && px === x)
+        if (p) return p[2]
+        return tile
+      })
+      .join(""),
+  )
+}
+
+const findValue = (object, predicate) => Object.values(object).find(predicate)
+const filterValues = (object, predicate) => Object.values(object).filter(predicate)
 
 const solve1 = ({ data }) => {
   const seen = {}
@@ -92,6 +90,7 @@ const solve1 = ({ data }) => {
 
   while (stack.length > 0) {
     const [players, energy] = stack.pop()
+    const debugMap = debug(players)
 
     const key = JSON.stringify([players, energy])
     if (key in seen) continue
@@ -108,66 +107,59 @@ const solve1 = ({ data }) => {
       // Amphipod is at bottom in its destination room
       if (y === d2y && x === d2x) continue players
 
-      // Amphipod is at top in its destionation room
+      // Amphipod is at top in its destination room
       // and is not blocking any foreign amphipod
-      const lower = Object.values(players).find(([y, x, pt]) => y === d1y && x === d1x && pt === t)
-      if (y === d1y && x === d1x && lower) continue players
-
-      const hallway = Object.values(players).filter(([y]) => y === 1)
+      const upperEquals = findValue(players, ([y, x, pt]) => y === d2y && x === d2x && pt === t)
+      if (y === d1y && x === d1x && upperEquals) continue players
 
       if (y > 1) {
         // Move amphipod to possible left waiting spots in hallway
         const leftWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx < x).reverse()
         left: for (const [ny, nx] of leftWaitingSpots) {
-          if (hallway.find(([_hy, hx]) => hx === nx) !== undefined) break left
+          if (findValue(players, ([y, x]) => y === ny && x === nx)) break left
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, nextEnergy])
+          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
         }
 
         // Move amphipod to possible right waiting spots in hallway
         const rightWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx > x)
         right: for (const [ny, nx] of rightWaitingSpots) {
-          if (hallway.find(([_hy, hx]) => hx === nx) !== undefined) break right
+          if (findValue(players, ([y, x]) => y === ny && x === nx)) break right
           const next = { [key]: [ny, nx, t] }
           const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, nextEnergy])
+          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
         }
       } else {
         // Move amphipod to destination room
-        const blocked = Object.values(players).find(([by, bx]) => by === y && bx > x && bx < d1x + 1)
-        if (blocked) continue // Way to room blocked
 
-        const occupiers = Object.values(players).filter(([oy, ox]) => oy === d1y && (ox === d1x || ox === d2x))
-        if (occupiers.find(([_oy, _ox, ot]) => ot !== t) !== undefined) continue // Room not enterable
+        const blocked = findValue(players, ([py, px]) => py === y && px > x && px < d1x + 1)
+        if (blocked) continue // Hallway to room blocked
 
-        if (
-          occupiers.find(([oy, ox]) => oy === d1y && ox === d1x) === undefined &&
-          occupiers.find(([oy, ox]) => oy === d2y && ox === d2x) === undefined
-        ) {
+        const rm1 = findValue(players, ([py, px]) => py === d1y && px === d1x)
+        const rm2 = findValue(players, ([py, px]) => py === d2y && px === d2x)
+
+        if ((rm1 && rm1[2] !== t) || (rm2 && rm2[2] !== t)) continue // Room not enterable
+
+        if (rm1 === undefined && rm2 === undefined) {
           // Move to bottom position in destination room
           const next = { [key]: [d2y, d2x, t] }
           const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, nextEnergy])
-        }
-
-        if (
-          occupiers.find(([oy, ox]) => oy === d1y && ox === d1x) === undefined &&
-          occupiers.find(([oy, ox]) => oy === d2y && ox === d2x) !== undefined
-        ) {
+          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
+        } else if (rm1 === undefined && rm2 !== undefined) {
           // Move to top position in destination room
           const next = { [key]: [d1y, d1x, t] }
-          const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
-          movingPlayers.push([{ ...players, ...next }, nextEnergy])
+          const nextEnergy = (Math.abs(y - d1y) + Math.abs(x - d1x)) * rules[t].energy
+          movingPlayers.push([{ ...players, ...next }, energy + nextEnergy])
         }
       }
     }
 
     if (movingPlayers.length === 0) {
-      const destA = Object.values(players).filter(([y, x, t]) => t === "A" && y > 1 && x === 3)
-      const destB = Object.values(players).filter(([y, x, t]) => t === "B" && y > 1 && x === 5)
-      const destC = Object.values(players).filter(([y, x, t]) => t === "C" && y > 1 && x === 7)
-      const destD = Object.values(players).filter(([y, x, t]) => t === "D" && y > 1 && x === 9)
+      const destA = filterValues(players, ([y, x, t]) => t === "A" && y > 1 && x === 3)
+      const destB = filterValues(players, ([y, x, t]) => t === "B" && y > 1 && x === 5)
+      const destC = filterValues(players, ([y, x, t]) => t === "C" && y > 1 && x === 7)
+      const destD = filterValues(players, ([y, x, t]) => t === "D" && y > 1 && x === 9)
 
       if (destA.length + destB.length + destC.length + destD.length !== 8) {
         // Broken configuration
