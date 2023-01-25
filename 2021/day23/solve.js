@@ -5,69 +5,68 @@ console.log("🎄 Day 23: Amphipod")
 
 /// Part 1
 
-const rules = {
-  A: {
-    energy: 1,
-    dest: [
-      [2, 3],
-      [3, 3],
-    ],
-  },
-  B: {
-    energy: 10,
-    dest: [
-      [2, 5],
-      [3, 5],
-    ],
-  },
-  C: {
-    energy: 100,
-    dest: [
-      [2, 7],
-      [3, 7],
-    ],
-  },
-  D: {
-    energy: 1000,
-    dest: [
-      [2, 9],
-      [3, 9],
-    ],
-  },
-}
+const moveCosts = { A: 1, B: 10, C: 100, D: 100 }
 
-const waitingSpots = [
-  [1, 1],
-  [1, 2],
-  [1, 4],
-  [1, 6],
-  [1, 8],
-  [1, 10],
-  [1, 11],
-]
-
-const debug = (players) => {
+const debugState = (state) => {
   const map = [
     ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
-    ["#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#"],
-    ["#", "#", "#", ".", "#", ".", "#", ".", "#", ".", "#", "#", "#"],
-    ["#", "#", "#", ".", "#", ".", "#", ".", "#", ".", "#", "#", "#"],
+    ["#", ...state.hallway.map((e) => (e === null ? "." : e)), "#"],
+    [
+      "#",
+      "#",
+      "#",
+      state.A[0] || ".",
+      "#",
+      state.B[0] || ".",
+      "#",
+      state.C[0] || ".",
+      "#",
+      state.D[0] || ".",
+      "#",
+      "#",
+      "#",
+    ],
+    [
+      "#",
+      "#",
+      "#",
+      state.A[1] || ".",
+      "#",
+      state.B[1] || ".",
+      "#",
+      state.C[1] || ".",
+      "#",
+      state.D[1] || ".",
+      "#",
+      "#",
+      "#",
+    ],
     ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
   ]
 
-  return map.map((row, y) =>
-    row
-      .map((tile, x) => {
-        const p = Object.values(players).find(([py, px]) => py === y && px === x)
-        if (p) return p[2]
-        return tile
-      })
-      .join(""),
-  )
+  return map.map((row) => row.join(""))
 }
 
-const findValue = (object, predicate) => Object.values(object).find(predicate)
-const filterValues = (object, predicate) => Object.values(object).filter(predicate)
+const conn = { A: 2, B: 4, C: 6, D: 8 }
+
+const wait = {
+  A: [
+    [1, 0],
+    [3, 5, 7, 9, 10],
+  ],
+  B: [
+    [3, 1, 0],
+    [5, 7, 9, 10],
+  ],
+  C: [
+    [5, 3, 1, 0],
+    [7, 9, 10],
+  ],
+  D: [
+    [7, 5, 3, 1, 0],
+    [9, 10],
+  ],
+}
 
 const solve1 = ({ data }) => {
   const seen = {}
@@ -75,118 +74,84 @@ const solve1 = ({ data }) => {
 
   var minEnergy = Number.POSITIVE_INFINITY
 
-  const players = {
-    p1: [2, 3, _.get(data, [2, 3])],
-    p2: [3, 3, _.get(data, [3, 3])],
-    p3: [2, 5, _.get(data, [2, 5])],
-    p4: [3, 5, _.get(data, [3, 5])],
-    p5: [2, 7, _.get(data, [2, 7])],
-    p6: [3, 7, _.get(data, [3, 7])],
-    p7: [2, 9, _.get(data, [2, 9])],
-    p8: [3, 9, _.get(data, [3, 9])],
+  const state = {
+    A: [_.get(data, [2, 3]), _.get(data, [3, 3])],
+    B: [_.get(data, [2, 5]), _.get(data, [3, 5])],
+    C: [_.get(data, [2, 7]), _.get(data, [3, 7])],
+    D: [_.get(data, [2, 9]), _.get(data, [3, 9])],
+    hallway: _.times(11, () => null),
   }
 
-  stack.push([players, 0, ["game start"]])
+  const ref = debugState(state)
+
+  stack.push([state, 0])
 
   while (stack.length > 0) {
-    const [players, energy, history] = stack.pop()
-    const debugMap = debug(players)
+    const [state, energy] = stack.pop()
 
-    const key = JSON.stringify([players, energy])
+    const key = JSON.stringify([state, energy])
     if (key in seen) continue
     seen[key] = true
 
     // Skip inefficient branches
     if (energy > minEnergy) continue
 
-    const movingPlayers = []
-    players: for (const [key, value] of Object.entries(players)) {
-      const [y, x, t] = value
-      const [[d1y, d1x], [d2y, d2x]] = rules[t].dest
+    // 1. Handle players in hallway
+    hallway: for (var pos = 0; pos < state.hallway.length; pos++) {
+      const player = state.hallway[pos]
+      if (player === null) continue hallway
 
-      // Amphipod is at bottom in its destination room
-      if (y === d2y && x === d2x) continue players
+      const top = state[player][0] || null
+      const bot = state[player][1] || null
+      if (top !== null || (bot !== null && bot !== player)) continue hallway
 
-      // Amphipod is at top in its destination room
-      // and is not blocking any foreign amphipod
-      const upperEquals = findValue(players, ([y, x, pt]) => y === d2y && x === d2x && pt === t)
-      if (y === d1y && x === d1x && upperEquals) continue players
+      const cp = conn[player]
+    }
 
-      if (y > 1) {
-        // Move amphipod to possible left waiting spots in hallway
-        const leftWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx < x).reverse()
-        left: for (const [ny, nx] of leftWaitingSpots) {
-          if (findValue(players, ([y, x]) => y === ny && x === nx)) break left
-          const next = { [key]: [ny, nx, t] }
-          const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([
-            { ...players, ...next },
-            energy + nextEnergy,
-            [...history, `${t} from (${y},${x}) to (${ny},${nx}) energy: ${nextEnergy}`],
-          ])
+    // 2. Handle players in rooms
+    rooms: for (const roomName of ["A", "B", "C", "D"]) {
+      const top = state[roomName][0] || null
+      const bot = state[roomName][1] || null
+
+      // Skip room if empty or in target state
+      if ((top === bot) === roomName || (top === bot) === null) continue rooms
+
+      // Move top amphipod
+      if (top !== null) {
+        const cp = conn[roomName]
+
+        for (const wps of wait[roomName]) {
+          wp: for (const wp of wps) {
+            // Skip loop when encounter first blocking amphipod
+            if (state.hallway[wp] !== null) break wp
+
+            var hallway = _.set([...state.hallway], wp, top)
+            const ne = energy + (1 + Math.abs(cp - wp)) * moveCosts[top]
+            stack.push([{ ...state, [roomName]: [null, bot], hallway }, ne])
+          }
         }
+      }
 
-        // Move amphipod to possible right waiting spots in hallway
-        const rightWaitingSpots = waitingSpots.filter(([_wpy, wsx]) => wsx > x)
-        right: for (const [ny, nx] of rightWaitingSpots) {
-          if (findValue(players, ([y, x]) => y === ny && x === nx)) break right
-          const next = { [key]: [ny, nx, t] }
-          const nextEnergy = (Math.abs(y - 1) + Math.abs(x - nx)) * rules[t].energy
-          movingPlayers.push([
-            { ...players, ...next },
-            energy + nextEnergy,
-            [...history, `${t} from (${y},${x}) to (${ny},${nx}) energy: ${nextEnergy}`],
-          ])
-        }
-      } else {
-        // Move amphipod to destination room
+      // Move second amphipod
+      if (top === null && bot !== null && bot !== roomName) {
+        const cp = conn[roomName]
 
-        const blocked = findValue(players, ([py, px]) => py === y && px > x && px < d1x + 1)
-        if (blocked) continue // Hallway to room blocked
+        for (const wps of wait[roomName]) {
+          wp: for (const wp of wps) {
+            // Skip loop when encounter first blocking amphipod
+            if (state.hallway[wp] !== null) continue wp
 
-        const rm1 = findValue(players, ([py, px]) => py === d1y && px === d1x)
-        const rm2 = findValue(players, ([py, px]) => py === d2y && px === d2x)
-
-        if ((rm1 && rm1[2] !== t) || (rm2 && rm2[2] !== t)) continue // Room not enterable
-
-        if (rm1 === undefined && rm2 === undefined) {
-          // Move to bottom position in destination room
-          const next = { [key]: [d2y, d2x, t] }
-          const nextEnergy = (Math.abs(y - d2y) + Math.abs(x - d2x)) * rules[t].energy
-          movingPlayers.push([
-            { ...players, ...next },
-            energy + nextEnergy,
-            [...history, `${t} from (${y},${x}) to (${d2y},${d2x}) energy: ${nextEnergy}`],
-          ])
-        } else if (rm1 === undefined && rm2 !== undefined) {
-          // Move to top position in destination room
-          const next = { [key]: [d1y, d1x, t] }
-          const nextEnergy = (Math.abs(y - d1y) + Math.abs(x - d1x)) * rules[t].energy
-          movingPlayers.push([
-            { ...players, ...next },
-            energy + nextEnergy,
-            [...history, `${t} from (${y},${x}) to (${d1y},${d1x}) energy: ${nextEnergy}`],
-          ])
+            var hallway = _.set([...state.hallway], wp, bot)
+            const ne = energy + (2 + Math.abs(cp - wp)) * moveCosts[bot]
+            stack.push([{ ...state, [roomName]: [null, null], hallway }, ne])
+          }
         }
       }
     }
 
-    if (movingPlayers.length === 0) {
-      const destA = filterValues(players, ([y, x, t]) => t === "A" && y > 1 && x === 3)
-      const destB = filterValues(players, ([y, x, t]) => t === "B" && y > 1 && x === 5)
-      const destC = filterValues(players, ([y, x, t]) => t === "C" && y > 1 && x === 7)
-      const destD = filterValues(players, ([y, x, t]) => t === "D" && y > 1 && x === 9)
-
-      if (destA.length + destB.length + destC.length + destD.length !== 8) {
-        // Broken configuration
-        continue
-      }
-
-      minEnergy = Math.min(minEnergy, energy)
-    }
-
-    // Move the amphipods
-    stack.push(...movingPlayers)
+    // // Move the amphipods
+    // stack.push(...movingPlayers)
+    stack.sort(([_s1, s1e], [_s2, s2e]) => s2e - s1e)
   }
 
   return minEnergy
