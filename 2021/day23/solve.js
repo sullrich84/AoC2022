@@ -5,7 +5,7 @@ console.log("🎄 Day 23: Amphipod")
 
 /// Part 1
 
-const moveCosts = { A: 1, B: 10, C: 100, D: 100 }
+const moveCosts = { A: 1, B: 10, C: 100, D: 1000 }
 
 const debugState = (state) => {
   const map = [
@@ -86,7 +86,7 @@ const solve1 = ({ data }) => {
 
   stack.push([state, 0])
 
-  while (stack.length > 0) {
+  loop: while (stack.length > 0) {
     const [state, energy] = stack.pop()
 
     const key = JSON.stringify([state, energy])
@@ -95,17 +95,46 @@ const solve1 = ({ data }) => {
 
     // Skip inefficient branches
     if (energy > minEnergy) continue
+    const il = stack.length
+
+    const res = _.flatten([state.A, state.B, state.C, state.D]).join("")
+
+    if (res === "AABBCCDD") {
+      minEnergy = energy
+      continue loop
+    }
 
     // 1. Handle players in hallway
     hallway: for (var pos = 0; pos < state.hallway.length; pos++) {
       const player = state.hallway[pos]
       if (player === null) continue hallway
 
+      // Check if amphipod can access it destination room
       const top = state[player][0] || null
       const bot = state[player][1] || null
       if (top !== null || (bot !== null && bot !== player)) continue hallway
 
+      // Check if way to destination room is free
       const cp = conn[player]
+      const [ws, we] = [Math.min(pos, cp), Math.max(pos, cp) + 1]
+      const way = state.hallway.slice(ws, we)
+      pos < cp ? (way[0] = null) : (way[way.length - 1] = null)
+      const wayBlocked = !!way.find((e) => e !== null)
+      if (wayBlocked) continue hallway
+
+      if (bot === null) {
+        // Move to bottom in destination room
+        var hallway = _.set([...state.hallway], pos, null)
+        const ne = energy + (2 + Math.abs(cp - pos)) * moveCosts[player]
+        stack.push([{ ...state, [player]: [null, player], hallway }, ne])
+        debugger
+      } else {
+        // Move to top in destination room
+        var hallway = _.set([...state.hallway], pos, null)
+        const ne = energy + (1 + Math.abs(cp - pos)) * moveCosts[player]
+        stack.push([{ ...state, [player]: [player, bot], hallway }, ne])
+        debugger
+      }
     }
 
     // 2. Handle players in rooms
@@ -149,8 +178,11 @@ const solve1 = ({ data }) => {
       }
     }
 
-    // // Move the amphipods
-    // stack.push(...movingPlayers)
+    if (stack.length === il) {
+      debugger
+    }
+
+    // Priorize low cost branches
     stack.sort(([_s1, s1e], [_s2, s2e]) => s2e - s1e)
   }
 
