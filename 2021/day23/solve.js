@@ -96,6 +96,7 @@ const solve1 = ({ data }) => {
     // Skip inefficient branches
     if (energy > minEnergy) continue
     const il = stack.length
+    const nextState = []
 
     const res = _.flatten([state.A, state.B, state.C, state.D]).join("")
 
@@ -126,14 +127,12 @@ const solve1 = ({ data }) => {
         // Move to bottom in destination room
         var hallway = _.set([...state.hallway], pos, null)
         const ne = energy + (2 + Math.abs(cp - pos)) * moveCosts[player]
-        stack.push([{ ...state, [player]: [null, player], hallway }, ne])
-        debugger
+        nextState.push([{ ...state, [player]: [null, player], hallway }, ne])
       } else {
         // Move to top in destination room
         var hallway = _.set([...state.hallway], pos, null)
         const ne = energy + (1 + Math.abs(cp - pos)) * moveCosts[player]
-        stack.push([{ ...state, [player]: [player, bot], hallway }, ne])
-        debugger
+        nextState.push([{ ...state, [player]: [player, bot], hallway }, ne])
       }
     }
 
@@ -156,7 +155,7 @@ const solve1 = ({ data }) => {
 
             var hallway = _.set([...state.hallway], wp, top)
             const ne = energy + (1 + Math.abs(cp - wp)) * moveCosts[top]
-            stack.push([{ ...state, [roomName]: [null, bot], hallway }, ne])
+            nextState.push([{ ...state, [roomName]: [null, bot], hallway }, ne])
           }
         }
       }
@@ -172,18 +171,23 @@ const solve1 = ({ data }) => {
 
             var hallway = _.set([...state.hallway], wp, bot)
             const ne = energy + (2 + Math.abs(cp - wp)) * moveCosts[bot]
-            stack.push([{ ...state, [roomName]: [null, null], hallway }, ne])
+            nextState.push([{ ...state, [roomName]: [null, null], hallway }, ne])
           }
         }
       }
     }
 
-    if (stack.length === il) {
-      debugger
+    const calcSortVal = ([{ A, B, C, D, hallway }]) => {
+      const ac = A.filter((e) => e === "A").length
+      const bc = B.filter((e) => e === "B").length
+      const cc = C.filter((e) => e === "C").length
+      const dc = D.filter((e) => e === "D").length
+      const hc = hallway.filter((e) => e !== null).map((e, pos) => Math.abs(pos - conn[e]) * moveCosts[e])
+      return _.sum([ac, bc, cc, dc, ...hc])
     }
 
-    // Priorize low cost branches
-    stack.sort(([_s1, s1e], [_s2, s2e]) => s2e - s1e)
+    nextState.sort((a, b) => calcSortVal(a) - calcSortVal(b))
+    stack.push(...nextState)
   }
 
   return minEnergy
