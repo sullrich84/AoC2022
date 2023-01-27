@@ -47,7 +47,7 @@ const debugState = (state) => {
   return map.map((row) => row.join(""))
 }
 
-const conn = { A: 2, B: 4, C: 6, D: 8 }
+const roomEntry = { A: 2, B: 4, C: 6, D: 8 }
 
 const wait = {
   A: [
@@ -95,12 +95,10 @@ const solve1 = ({ data }) => {
 
     // Skip inefficient branches
     if (energy > minEnergy) continue
-    const il = stack.length
     const nextState = []
 
-    const res = _.flatten([state.A, state.B, state.C, state.D]).join("")
-
-    if (res === "AABBCCDD") {
+    const rooms = _.flatten([state.A, state.B, state.C, state.D])
+    if (rooms.join("") === "AABBCCDD") {
       minEnergy = energy
       continue loop
     }
@@ -115,12 +113,16 @@ const solve1 = ({ data }) => {
       const bot = state[player][1] || null
       if (top !== null || (bot !== null && bot !== player)) continue hallway
 
-      // Check if way to destination room is free
-      const cp = conn[player]
-      const [ws, we] = [Math.min(pos, cp), Math.max(pos, cp) + 1]
-      const way = state.hallway.slice(ws, we)
-      pos < cp ? (way[0] = null) : (way[way.length - 1] = null)
-      const wayBlocked = !!way.find((e) => e !== null)
+      // Calculate taxi way to destination room
+      const cp = roomEntry[player]
+      const [ts, te] = [Math.min(pos, cp), Math.max(pos, cp) + 1]
+      const tw = state.hallway.slice(ts, te)
+
+      // Clear current amphipod from taxi way
+      pos < cp ? (tw[0] = null) : (tw[tw.length - 1] = null)
+
+      // Check if taxi way is passable
+      const wayBlocked = !!tw.find((e) => e !== null)
       if (wayBlocked) continue hallway
 
       if (bot === null) {
@@ -146,47 +148,95 @@ const solve1 = ({ data }) => {
 
       // Move top amphipod
       if (top !== null) {
-        const cp = conn[roomName]
+        // Calculate taxi way to destination room
+        const ap = top
+        const cp = roomEntry[roomName]
+        const ep = roomEntry[ap]
+        const tw = state.hallway.slice(Math.min(ep, cp), Math.max(ep, cp) + 1)
+        const twFree = !tw.find((e) => e !== null)
 
-        for (const wps of wait[roomName]) {
-          wp: for (const wp of wps) {
-            // Skip loop when encounter first blocking amphipod
-            if (state.hallway[wp] !== null) break wp
+        // Check if destination room is accessible
+        const dr = state[ap]
+        const drAccess = dr[0] === null && (dr[1] === null || dr[1] === ap)
 
-            var hallway = _.set([...state.hallway], wp, top)
-            const ne = energy + (1 + Math.abs(cp - wp)) * moveCosts[top]
-            nextState.push([{ ...state, [roomName]: [null, bot], hallway }, ne])
+        if (twFree && drAccess) {
+          if (dr[1] !== null) {
+            // Move from top to destination top
+            const ne = energy + (1 + tw.length) * moveCosts[ap]
+            nextState.push([{ ...state, [roomName]: [null, bot], [ap]: [ap, dr[1]] }, ne])
+          } else {
+            // Move from top to destination bottom
+            const ne = energy + (2 + tw.length) * moveCosts[ap]
+            nextState.push([{ ...state, [roomName]: [null, bot], [ap]: [null, ap] }, ne])
+          }
+        } else {
+          // Park top amphipod in hallway
+          for (const wps of wait[roomName]) {
+            wp: for (const wp of wps) {
+              // Skip loop when encounter first blocking amphipod
+              if (state.hallway[wp] !== null) break wp
+
+              var hallway = _.set([...state.hallway], wp, ap)
+              const ne = energy + (1 + Math.abs(cp - wp)) * moveCosts[ap]
+              nextState.push([{ ...state, [roomName]: [null, bot], hallway }, ne])
+            }
           }
         }
       }
 
       // Move second amphipod
       if (top === null && bot !== null && bot !== roomName) {
-        const cp = conn[roomName]
+        // Calculate taxi way to destination room
+        const ap = bot
+        const cp = roomEntry[roomName]
+        const ep = roomEntry[ap]
+        const tw = state.hallway.slice(Math.min(ep, cp), Math.max(ep, cp) + 1)
+        const twFree = !tw.find((e) => e !== null)
 
-        for (const wps of wait[roomName]) {
-          wp: for (const wp of wps) {
-            // Skip loop when encounter first blocking amphipod
-            if (state.hallway[wp] !== null) continue wp
+        // Check if destination room is accessible
+        const dr = state[ap]
+        const drAccess = dr[0] === null && (dr[1] === null || dr[1] === ap)
 
-            var hallway = _.set([...state.hallway], wp, bot)
-            const ne = energy + (2 + Math.abs(cp - wp)) * moveCosts[bot]
-            nextState.push([{ ...state, [roomName]: [null, null], hallway }, ne])
+        if (twFree && drAccess) {
+          if (dr[1] !== null) {
+            // Move from bottom to destination top
+            const ne = energy + (3 + tw.length) * moveCosts[ap]
+            nextState.push([{ ...state, [roomName]: [null, null], [ap]: [ap, dr[1]] }, ne])
+          } else {
+            // Move from bottom to destination bottom
+            const ne = energy + (4 + tw.length) * moveCosts[ap]
+            nextState.push([{ ...state, [roomName]: [null, null], [ap]: [null, ap] }, ne])
+          }
+        } else {
+          // Park bottom amphipod in hallway
+          for (const wps of wait[roomName]) {
+            wp: for (const wp of wps) {
+              // Skip loop when encounter first blocking amphipod
+              if (state.hallway[wp] !== null) continue wp
+
+              var hallway = _.set([...state.hallway], wp, ap)
+              const ne = energy + (2 + Math.abs(cp - wp)) * moveCosts[ap]
+              nextState.push([{ ...state, [roomName]: [null, null], hallway }, ne])
+            }
           }
         }
       }
     }
 
-    const calcSortVal = ([{ A, B, C, D, hallway }]) => {
-      const ac = A.filter((e) => e === "A").length
-      const bc = B.filter((e) => e === "B").length
-      const cc = C.filter((e) => e === "C").length
-      const dc = D.filter((e) => e === "D").length
-      const hc = hallway.filter((e) => e !== null).map((e, pos) => Math.abs(pos - conn[e]) * moveCosts[e])
-      return _.sum([ac, bc, cc, dc, ...hc])
-    }
+    // Calculate the costs to move given amphipods from the hallway
+    // to it's destination room.
+    // const calcSortVal = ([{ hallway, ...rooms }]) => {
+    //   return _.sum(
+    //     hallway.map((amphipod, pos) => {
+    //       if (amphipod === null) return 0
+    //       const entry = roomEntry[amphipod]
+    //       const occupied = rooms[amphipod][1] === amphipod
+    //       return (Math.abs(pos - entry) + occupied ? 1 : 2) * moveCosts[amphipod]
+    //     }),
+    //   )
+    // }
 
-    nextState.sort((a, b) => calcSortVal(a) - calcSortVal(b))
+    // nextState.sort((a, b) => calcSortVal(a) - calcSortVal(b))
     stack.push(...nextState)
   }
 
