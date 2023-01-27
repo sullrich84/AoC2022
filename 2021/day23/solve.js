@@ -73,6 +73,12 @@ const solve1 = ({ data }) => {
   const stack = []
 
   var minEnergy = Number.POSITIVE_INFINITY
+  var minEnergyByRoom = [
+    Number.POSITIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+  ]
 
   const state = {
     A: [_.get(data, [2, 3]), _.get(data, [3, 3])],
@@ -89,13 +95,37 @@ const solve1 = ({ data }) => {
   loop: while (stack.length > 0) {
     const [state, energy] = stack.pop()
 
-    const key = JSON.stringify([state, energy])
-    if (key in seen) continue
-    seen[key] = true
+    // Skip ineffient states
+    if (minEnergy !== Number.POSITIVE_INFINITY) {
+      if (energy >= minEnergy) continue loop
 
-    // Skip inefficient branches
-    if (energy > minEnergy) continue
+      const { hallway, ...rooms } = state
+      const optimisticCosts = _.sum(
+        hallway.map((amphipod, pos) => {
+          if (amphipod === null) return 0
+          const entry = roomEntry[amphipod]
+          const occupied = rooms[amphipod][1] === amphipod
+          return (Math.abs(pos - entry) + occupied ? 1 : 2) * moveCosts[amphipod]
+        }),
+      )
+
+      if (energy + optimisticCosts >= minEnergy) continue loop
+    }
+
     const nextState = []
+
+    const roomKey = _.flatten([state.A, state.B, state.C, state.D])
+      .map((a) => a || ".")
+      .join("")
+
+    if (roomKey in seen && seen[roomKey] < energy) continue loop
+    seen[roomKey] = energy
+
+    // Skip branches with states that have been
+    // calculated with better results before
+    const key = JSON.stringify(state)
+    if (key in seen && seen[key] < energy) continue loop
+    seen[key] = energy
 
     const rooms = _.flatten([state.A, state.B, state.C, state.D])
     if (rooms.join("") === "AABBCCDD") {
@@ -223,21 +253,44 @@ const solve1 = ({ data }) => {
       }
     }
 
-    // Calculate the costs to move given amphipods from the hallway
-    // to it's destination room.
-    // const calcSortVal = ([{ hallway, ...rooms }]) => {
-    //   return _.sum(
-    //     hallway.map((amphipod, pos) => {
-    //       if (amphipod === null) return 0
-    //       const entry = roomEntry[amphipod]
-    //       const occupied = rooms[amphipod][1] === amphipod
-    //       return (Math.abs(pos - entry) + occupied ? 1 : 2) * moveCosts[amphipod]
-    //     }),
-    //   )
-    // }
+    // Skip states with lock situations
+    if (nextState.length === 0) {
+      continue
+    }
 
-    // nextState.sort((a, b) => calcSortVal(a) - calcSortVal(b))
+    // Favor states that have completed room
+    // Favor states by optimistic costs where completed rooms are equal
+    const calcSortVal = ([{ hallway, ...rooms }]) => {
+      const aScore = rooms["A"][1] === "A" ? (rooms["A"][0] === "A" ? 2 : 1) : 0
+      const bScore = rooms["B"][1] === "B" ? (rooms["B"][0] === "B" ? 2 : 1) : 0
+      const cScore = rooms["C"][1] === "C" ? (rooms["C"][0] === "C" ? 2 : 1) : 0
+      const dScore = rooms["D"][1] === "D" ? (rooms["D"][0] === "D" ? 2 : 1) : 0
+
+      const optimisticCosts = _.sum(
+        hallway.map((amphipod, pos) => {
+          if (amphipod === null) return 0
+          const entry = roomEntry[amphipod]
+          const occupied = rooms[amphipod][1] === amphipod
+          return (Math.abs(pos - entry) + occupied ? 1 : 2) * moveCosts[amphipod]
+        }),
+      )
+
+      return [aScore + bScore * 10 + cScore * 100 + dScore * 1000, optimisticCosts]
+    }
+
     stack.push(...nextState)
+    stack.sort((a, b) => {
+      const [aScore, aOptCost] = calcSortVal(a)
+      const [bScore, bOptCost] = calcSortVal(b)
+
+      if (aScore === bScore) {
+        // Ascending
+        return bOptCost - aOptCost
+      } else {
+        // Decending
+        return aScore - bScore
+      }
+    })
   }
 
   return minEnergy
