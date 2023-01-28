@@ -97,7 +97,6 @@ const solve1 = ({ data }) => {
 
     if (roomKey === "AABBCCDD") {
       minEnergy = energy
-      if (energy === 12523) debugger
       continue loop
     }
 
@@ -259,13 +258,8 @@ const solve1 = ({ data }) => {
       const [aScore, aOptCost] = calcSortVal(a)
       const [bScore, bOptCost] = calcSortVal(b)
 
-      if (aScore === bScore) {
-        // Ascending
-        return bOptCost - aOptCost
-      } else {
-        // Decending
-        return aScore - bScore
-      }
+      if (aScore === bScore) return bOptCost - aOptCost
+      return aScore - bScore
     })
   }
 
@@ -273,7 +267,7 @@ const solve1 = ({ data }) => {
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
