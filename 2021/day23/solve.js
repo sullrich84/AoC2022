@@ -87,17 +87,16 @@ const solve1 = ({ data }) => {
 
   loop: while (stack.length > 0) {
     const [state, energy, history] = stack.pop()
-    const nextState = []
 
-    const rooms = _.flatten([state.A, state.B, state.C, state.D])
+    const rooms = _.flatten([state.A, state.B, state.C, state.D, state.hallway])
     const roomKey = rooms.map((a) => a || ".").join("")
 
-    if (roomKey in seen && seen[roomKey] < energy) continue loop
+    if (roomKey in seen) continue loop
     seen[roomKey] = energy
 
-    if (roomKey === "AABBCCDD") {
+    if (roomKey.substr(0, 8) === "AABBCCDD") {
       minEnergy = energy
-      continue loop
+      break loop
     }
 
     // 1. Handle players in hallway
@@ -125,15 +124,15 @@ const solve1 = ({ data }) => {
       if (bot === null) {
         // Move to bottom in destination room
         var hallway = _.set([...state.hallway], pos, null)
-        const ne = energy + (2 + Math.abs(cp - pos)) * moveCosts[player]
-        var msg = `${player}: HW(${pos}) -> ${player}(1)`
-        nextState.push([{ ...state, [player]: [null, player], hallway }, ne, [...history, msg]])
+        const costs = (2 + Math.abs(cp - pos)) * moveCosts[player]
+        var msg = `${player}: HW(${pos}) -> ${player}(1) @${energy} + ${costs}`
+        stack.push([{ ...state, [player]: [null, player], hallway }, energy + costs, [...history, msg]])
       } else {
         // Move to top in destination room
         var hallway = _.set([...state.hallway], pos, null)
-        const ne = energy + (1 + Math.abs(cp - pos)) * moveCosts[player]
-        var msg = `${player}: HW(${pos}) -> ${player}(0)`
-        nextState.push([{ ...state, [player]: [player, bot], hallway }, ne, [...history, msg]])
+        const costs = (1 + Math.abs(cp - pos)) * moveCosts[player]
+        var msg = `${player}: HW(${pos}) -> ${player}(0) @${energy} + ${costs}`
+        stack.push([{ ...state, [player]: [player, bot], hallway }, energy + costs, [...history, msg]])
       }
     }
 
@@ -161,26 +160,26 @@ const solve1 = ({ data }) => {
         if (twFree && drAccess) {
           if (dr[1] !== null) {
             // Move from top to destination top
-            const ne = energy + (1 + tw.length) * moveCosts[ap]
-            var msg = `${ap}: ${roomName}(0) -> ${ap}(0)`
-            nextState.push([{ ...state, [roomName]: [null, bot], [ap]: [ap, dr[1]] }, ne, [...history, msg]])
+            const costs = (1 + tw.length) * moveCosts[ap]
+            var msg = `${ap}: ${roomName}(0) -> ${ap}(0) @${energy} + ${costs}`
+            stack.push([{ ...state, [roomName]: [null, bot], [ap]: [ap, dr[1]] }, energy + costs, [...history, msg]])
           } else {
             // Move from top to destination bottom
-            const ne = energy + (2 + tw.length) * moveCosts[ap]
-            var msg = `${ap}: ${roomName}(0) -> ${ap}(1)`
-            nextState.push([{ ...state, [roomName]: [null, bot], [ap]: [null, ap] }, ne, [...history, msg]])
+            const costs = (2 + tw.length) * moveCosts[ap]
+            var msg = `${ap}: ${roomName}(0) -> ${ap}(1) @${energy} + ${costs}`
+            stack.push([{ ...state, [roomName]: [null, bot], [ap]: [null, ap] }, energy + costs, [...history, msg]])
           }
         } else {
           // Park top amphipod in hallway
           for (const wps of wait[roomName]) {
             wp: for (const wp of wps) {
-              // Skip loop when encounter first blocking amphipod
+              // Break loop when encounter first blocking amphipod
               if (state.hallway[wp] !== null) break wp
 
               var hallway = _.set([...state.hallway], wp, ap)
-              const ne = energy + (1 + Math.abs(cp - wp)) * moveCosts[ap]
-              var msg = `${ap}: ${roomName}(0) -> HW(${wp})`
-              nextState.push([{ ...state, [roomName]: [null, bot], hallway }, ne, [...history, msg]])
+              const costs = (1 + Math.abs(cp - wp)) * moveCosts[ap]
+              var msg = `${ap}: ${roomName}(0) -> HW(${wp}) @${energy} + ${costs}`
+              stack.push([{ ...state, [roomName]: [null, bot], hallway }, energy + costs, [...history, msg]])
             }
           }
         }
@@ -202,65 +201,33 @@ const solve1 = ({ data }) => {
         if (twFree && drAccess) {
           if (dr[1] !== null) {
             // Move from bottom to destination top
-            const ne = energy + (3 + tw.length) * moveCosts[ap]
-            var msg = `${ap}: ${roomName}(1) -> ${ap}(0)`
-            nextState.push([{ ...state, [roomName]: [null, null], [ap]: [ap, dr[1]] }, ne, [...history, msg]])
+            const costs = (2 + tw.length) * moveCosts[ap]
+            var msg = `${ap}: ${roomName}(1) -> ${ap}(0) @${energy} + ${costs}`
+            stack.push([{ ...state, [roomName]: [null, null], [ap]: [ap, dr[1]] }, energy + costs, [...history, msg]])
           } else {
             // Move from bottom to destination bottom
-            const ne = energy + (4 + tw.length) * moveCosts[ap]
-            var msg = `${ap}: ${roomName}(1) -> ${ap}(1)`
-            nextState.push([{ ...state, [roomName]: [null, null], [ap]: [null, ap] }, ne, [...history, msg]])
+            const costs = (3 + tw.length) * moveCosts[ap]
+            var msg = `${ap}: ${roomName}(1) -> ${ap}(1) @${energy} + ${costs}`
+            stack.push([{ ...state, [roomName]: [null, null], [ap]: [null, ap] }, energy + costs, [...history, msg]])
           }
         } else {
           // Park bottom amphipod in hallway
           for (const wps of wait[roomName]) {
             wp: for (const wp of wps) {
-              // Skip loop when encounter first blocking amphipod
-              if (state.hallway[wp] !== null) continue wp
+              // Break loop when encounter first blocking amphipod
+              if (state.hallway[wp] !== null) break wp
 
               var hallway = _.set([...state.hallway], wp, ap)
-              const ne = energy + (2 + Math.abs(cp - wp)) * moveCosts[ap]
-              var msg = `${ap}: ${roomName}(1) -> HW(${wp})`
-              nextState.push([{ ...state, [roomName]: [null, null], hallway }, ne, [...history, msg]])
+              const costs = (2 + Math.abs(cp - wp)) * moveCosts[ap]
+              var msg = `${ap}: ${roomName}(1) -> HW(${wp}) @${energy} + ${costs}`
+              stack.push([{ ...state, [roomName]: [null, null], hallway }, energy + costs, [...history, msg]])
             }
           }
         }
       }
     }
 
-    // Skip states with lock situations
-    if (nextState.length === 0) {
-      continue
-    }
-
-    // Favor states that have completed room
-    // Favor states by optimistic costs where completed rooms are equal
-    const calcSortVal = ([{ hallway, ...rooms }]) => {
-      const aScore = rooms["A"][1] === "A" ? (rooms["A"][0] === "A" ? 2 : 1) : 0
-      const bScore = rooms["B"][1] === "B" ? (rooms["B"][0] === "B" ? 2 : 1) : 0
-      const cScore = rooms["C"][1] === "C" ? (rooms["C"][0] === "C" ? 2 : 1) : 0
-      const dScore = rooms["D"][1] === "D" ? (rooms["D"][0] === "D" ? 2 : 1) : 0
-
-      const optimisticCosts = _.sum(
-        hallway.map((amphipod, pos) => {
-          if (amphipod === null) return 0
-          const entry = roomEntry[amphipod]
-          const occupied = rooms[amphipod][1] === amphipod
-          return (Math.abs(pos - entry) + occupied ? 1 : 2) * moveCosts[amphipod]
-        }),
-      )
-
-      return [aScore + bScore * 10 + cScore * 100 + dScore * 1000, optimisticCosts]
-    }
-
-    stack.push(...nextState)
-    stack.sort((a, b) => {
-      const [aScore, aOptCost] = calcSortVal(a)
-      const [bScore, bOptCost] = calcSortVal(b)
-
-      if (aScore === bScore) return bOptCost - aOptCost
-      return aScore - bScore
-    })
+    stack.sort(([_a, ae], [_b, be]) => be - ae)
   }
 
   return minEnergy
@@ -270,7 +237,6 @@ console.log("Sample:", [{ data: sample }].map(solve1))
 console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
-
 const solve2 = ({ data }) => {
   return 0
 }
