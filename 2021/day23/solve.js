@@ -87,6 +87,7 @@ const solve1 = ({ data }) => {
 
   loop: while (stack.length > 0) {
     const [state, energy, history] = stack.pop()
+    const nextStack = []
 
     const rooms = _.flatten([state.A, state.B, state.C, state.D, state.hallway])
     const roomKey = rooms.map((a) => a || ".").join("")
@@ -114,7 +115,7 @@ const solve1 = ({ data }) => {
       // Check if taxi way from current waiting position to desitination room is accessible
       const cp = roomEntry[curr]
       const taxiWay = state.hallway.slice(Math.min(i, cp), Math.max(i, cp) + 1)
-      _.set(taxiWay, i < cp ? 0 : taxiWay.length - 1, null)
+      taxiWay[i < cp ? 0 : taxiWay.length - 1] = null
       const taxiWayAccess = !taxiWay.find((e) => e !== null)
       if (!taxiWayAccess) continue hallway
 
@@ -127,11 +128,11 @@ const solve1 = ({ data }) => {
 
       // Create next target state
       const nextState = _.cloneDeep(state)
-      _.set(nextState, ["hallway", i], null)
-      _.set(nextState, [curr, tp], curr)
+      nextState.hallway[i] = null
+      nextState[curr][tp] = curr
 
       var msg = `Move ${curr} from waiting position HW:${i} to destination room ${curr}:${tp} for ${costs} costs`
-      stack.push([nextState, nextEnergy, [...history, msg]])
+      nextStack.push([nextState, nextEnergy, [...history, msg]])
     }
 
     // -------------------------------------------------
@@ -179,11 +180,11 @@ const solve1 = ({ data }) => {
 
           // Create next target state
           const nextState = _.cloneDeep(state)
-          _.set(nextState, [roomName, i], null)
-          _.set(nextState, `${curr}[${i}]`, curr)
+          nextState[roomName][i] = null
+          nextState[curr][i] = curr
 
           var msg = `Move ${curr} from ${roomName}:${i} to destination room ${curr}:${tp} for ${costs} costs`
-          stack.push([nextState, nextEnergy, [...history, msg]])
+          nextStack.push([nextState, nextEnergy, [...history, msg]])
 
           break room
         }
@@ -202,18 +203,20 @@ const solve1 = ({ data }) => {
 
             // Create next target state
             const nextState = _.cloneDeep(state)
-            _.set(nextState, [roomName, i], null)
-            _.set(nextState, ["hallway", wp], curr)
+            nextState[roomName][i] = null
+            nextState.hallway[wp] = curr
 
             var msg = `Move ${curr} from ${roomName}:${i} to wait at HW:${wp} for ${costs} costs`
-            stack.push([nextState, nextEnergy, [...history, msg]])
+            nextStack.push([nextState, nextEnergy, [...history, msg]])
           }
         }
       }
     }
 
-    // Priorize stack by engergy (lowest last)
-    stack.sort(([_a, aEnergy], [_b, bEnergy]) => bEnergy - aEnergy)
+    if (nextStack.length > 0) {
+      stack.push(...nextStack)
+      stack.sort(([_a, aEnergy], [_b, bEnergy]) => bEnergy - aEnergy)
+    }
   }
 
   return minEnergy
