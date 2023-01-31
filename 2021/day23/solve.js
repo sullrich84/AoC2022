@@ -189,22 +189,6 @@ console.log("Sample:", [{ data: sample1 }].map(solve))
 console.log("Task:", [{ data: data1 }].map(solve))
 
 /// Part 2
-const solve2 = ({ data }) => {
-  const seen = {}
-  const stack = []
-
-  var minEnergy = Number.POSITIVE_INFINITY
-
-  const state = {
-    A: [_.get(data, [2, 3]), "D", "D", _.get(data, [3, 3])],
-    B: [_.get(data, [2, 5]), "C", "B", _.get(data, [3, 5])],
-    C: [_.get(data, [2, 7]), "B", "A", _.get(data, [3, 7])],
-    D: [_.get(data, [2, 9]), "A", "C", _.get(data, [3, 9])],
-    hallway: _.times(11, () => null),
-  }
-
-  return minEnergy
-}
 
 console.log("Sample:", [{ data: sample2 }].map(solve))
 console.log("Task:", [{ data: data2 }].map(solve))
