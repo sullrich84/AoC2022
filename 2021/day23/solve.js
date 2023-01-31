@@ -5,97 +5,27 @@ console.log("🎄 Day 23: Amphipod")
 
 /// Part 1
 
-const moveCosts = { A: 1, B: 10, C: 100, D: 1000 }
-
-const debugState = (state) => {
-  const map = [
-    ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
-    ["#", ...state.hallway.map((e) => (e === null ? "." : e)), "#"],
-    [
-      "#",
-      "#",
-      "#",
-      state.A[0] || ".",
-      "#",
-      state.B[0] || ".",
-      "#",
-      state.C[0] || ".",
-      "#",
-      state.D[0] || ".",
-      "#",
-      "#",
-      "#",
+const rules = {
+  costs: { A: 1, B: 10, C: 100, D: 1000 },
+  entry: { A: 2, B: 4, C: 6, D: 8 },
+  wait: {
+    A: [
+      [1, 0],
+      [3, 5, 7, 9, 10],
     ],
-    [
-      "#",
-      "#",
-      "#",
-      state.A[1] || ".",
-      "#",
-      state.B[1] || ".",
-      "#",
-      state.C[1] || ".",
-      "#",
-      state.D[1] || ".",
-      "#",
-      "#",
-      "#",
+    B: [
+      [3, 1, 0],
+      [5, 7, 9, 10],
     ],
-    [
-      "#",
-      "#",
-      "#",
-      state.A[2] || ".",
-      "#",
-      state.B[2] || ".",
-      "#",
-      state.C[2] || ".",
-      "#",
-      state.D[2] || ".",
-      "#",
-      "#",
-      "#",
+    C: [
+      [5, 3, 1, 0],
+      [7, 9, 10],
     ],
-    [
-      "#",
-      "#",
-      "#",
-      state.A[3] || ".",
-      "#",
-      state.B[3] || ".",
-      "#",
-      state.C[3] || ".",
-      "#",
-      state.D[3] || ".",
-      "#",
-      "#",
-      "#",
+    D: [
+      [7, 5, 3, 1, 0],
+      [9, 10],
     ],
-    ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
-  ]
-
-  return map.map((row) => row.join(""))
-}
-
-const roomEntry = { A: 2, B: 4, C: 6, D: 8 }
-
-const wait = {
-  A: [
-    [1, 0],
-    [3, 5, 7, 9, 10],
-  ],
-  B: [
-    [3, 1, 0],
-    [5, 7, 9, 10],
-  ],
-  C: [
-    [5, 3, 1, 0],
-    [7, 9, 10],
-  ],
-  D: [
-    [7, 5, 3, 1, 0],
-    [9, 10],
-  ],
+  },
 }
 
 const solve = ({ data }) => {
@@ -146,7 +76,7 @@ const solve = ({ data }) => {
       if (!destRoomAccess) continue hallway
 
       // Check if taxi way from current waiting position to desitination room is accessible
-      const cp = roomEntry[curr]
+      const cp = rules.entry[curr]
       const taxiWay = state.hallway.slice(Math.min(i, cp), Math.max(i, cp) + 1)
       taxiWay[i < cp ? 0 : taxiWay.length - 1] = null
       const taxiWayAccess = !taxiWay.find((e) => e !== null)
@@ -156,7 +86,7 @@ const solve = ({ data }) => {
       const tp = _.lastIndexOf(state[curr], null)
 
       // Calculate moving costs to target position
-      const costs = (taxiWay.length + tp) * moveCosts[curr]
+      const costs = (taxiWay.length + tp) * rules.costs[curr]
       const nextEnergy = energy + costs
 
       // Create next target state
@@ -195,8 +125,8 @@ const solve = ({ data }) => {
         const destRoomAccess = !state[curr].find((e) => e !== null && e !== curr)
 
         // Check if taxi way from current room to desitination room is accessible
-        const ep = roomEntry[curr]
-        const cp = roomEntry[roomName]
+        const ep = rules.entry[curr]
+        const cp = rules.entry[roomName]
         const taxiWay = state.hallway.slice(Math.min(ep, cp), Math.max(ep, cp) + 1)
         const taxiWayAccess = !taxiWay.find((e) => e !== null)
 
@@ -208,7 +138,7 @@ const solve = ({ data }) => {
           const tp = _.lastIndexOf(state[curr], null)
 
           // Calculate moving costs to target position
-          const costs = (i + 1 + Math.abs(cp - ep) + tp + 1) * moveCosts[curr]
+          const costs = (i + 1 + Math.abs(cp - ep) + tp + 1) * rules.costs[curr]
           const nextEnergy = energy + costs
 
           // Create next target state
@@ -225,13 +155,13 @@ const solve = ({ data }) => {
         // -----------------------------------------------
         // Move amphipod to all possible waiting positions
         // -----------------------------------------------
-        for (const lrWp of wait[roomName]) {
+        for (const lrWp of rules.wait[roomName]) {
           wp: for (const wp of lrWp) {
             // Break loop when encounter first blocking amphipod
             if (state.hallway[wp] !== null) break wp
 
             // Calculate moving costs to wait position
-            const costs = (i + 1 + Math.abs(cp - wp)) * moveCosts[curr]
+            const costs = (i + 1 + Math.abs(cp - wp)) * rules.costs[curr]
             const nextEnergy = energy + costs
 
             // Create next target state
