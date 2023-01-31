@@ -1,5 +1,5 @@
 import _ from "lodash"
-import data, { sample } from "./data.js"
+import { data1, sample1, data2, sample2 } from "./data.js"
 
 console.log("🎄 Day 23: Amphipod")
 
@@ -41,6 +41,36 @@ const debugState = (state) => {
       "#",
       "#",
     ],
+    [
+      "#",
+      "#",
+      "#",
+      state.A[2] || ".",
+      "#",
+      state.B[2] || ".",
+      "#",
+      state.C[2] || ".",
+      "#",
+      state.D[2] || ".",
+      "#",
+      "#",
+      "#",
+    ],
+    [
+      "#",
+      "#",
+      "#",
+      state.A[3] || ".",
+      "#",
+      state.B[3] || ".",
+      "#",
+      state.C[3] || ".",
+      "#",
+      state.D[3] || ".",
+      "#",
+      "#",
+      "#",
+    ],
     ["#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"],
   ]
 
@@ -68,21 +98,23 @@ const wait = {
   ],
 }
 
-const solve1 = ({ data }) => {
+const solve = ({ data }) => {
   const seen = {}
   const stack = []
 
   var minEnergy = Number.POSITIVE_INFINITY
 
   const state = {
-    A: [_.get(data, [2, 3]), _.get(data, [3, 3])],
-    B: [_.get(data, [2, 5]), _.get(data, [3, 5])],
-    C: [_.get(data, [2, 7]), _.get(data, [3, 7])],
-    D: [_.get(data, [2, 9]), _.get(data, [3, 9])],
+    A: data[0],
+    B: data[1],
+    C: data[2],
+    D: data[3],
     hallway: _.times(11, () => null),
   }
 
-  const _ref = debugState(state)
+  const roomSize = data[0].length
+  const finalRoomConfig = ["A", "B", "C", "D"].map((c) => c.repeat(roomSize)).join("")
+
   stack.push([state, 0, []])
 
   loop: while (stack.length > 0) {
@@ -91,12 +123,13 @@ const solve1 = ({ data }) => {
 
     const rooms = _.flatten([state.A, state.B, state.C, state.D, state.hallway])
     const roomKey = rooms.map((a) => a || ".").join("")
+    const roomConfig = roomKey.substring(0, 4 * roomSize)
 
     if (roomKey in seen) continue loop
     seen[roomKey] = energy
 
     // Check if the game is in end state
-    if (roomKey.substr(0, 8) === "AABBCCDD") {
+    if (roomConfig === finalRoomConfig) {
       minEnergy = energy
       break loop
     }
@@ -155,7 +188,7 @@ const solve1 = ({ data }) => {
         if (blocked) break room
 
         // Skip room if current amphipod don't have to move
-        const mustMove = curr !== room || bots.find((e) => e !== roomName)
+        const mustMove = curr !== roomName || (bots.length > 0 && !!bots.find((e) => e !== curr))
         if (!mustMove) break room
 
         // Check if destination room of amphipod is accessible
@@ -181,7 +214,7 @@ const solve1 = ({ data }) => {
           // Create next target state
           const nextState = _.cloneDeep(state)
           nextState[roomName][i] = null
-          nextState[curr][i] = curr
+          nextState[curr][tp] = curr
 
           var msg = `Move ${curr} from ${roomName}:${i} to destination room ${curr}:${tp} for ${costs} costs`
           nextStack.push([nextState, nextEnergy, [...history, msg]])
@@ -222,8 +255,8 @@ const solve1 = ({ data }) => {
   return minEnergy
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
-console.log("Task:", [{ data: data }].map(solve1))
+console.log("Sample:", [{ data: sample1 }].map(solve))
+console.log("Task:", [{ data: data1 }].map(solve))
 
 /// Part 2
 const solve2 = ({ data }) => {
@@ -243,5 +276,5 @@ const solve2 = ({ data }) => {
   return minEnergy
 }
 
-// console.log("Sample:", [{ data: sample }].map(solve2))
-// console.log("Task:", [{ data: data }].map(solve2))
+console.log("Sample:", [{ data: sample2 }].map(solve))
+console.log("Task:", [{ data: data2 }].map(solve))
