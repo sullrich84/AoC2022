@@ -10,10 +10,6 @@ function debug(map) {
 }
 
 const solve1 = ({ data }) => {
-  // East movers = 1
-  // South mover = 2
-  // Empty space = 0
-
   const [w, h] = [data[0].length, data.length]
 
   var steps = 0
@@ -24,7 +20,7 @@ const solve1 = ({ data }) => {
     const dMap = debug(map)
     var moved = 0
 
-    var eastMovedMap = _.cloneDeep(map)
+    var nextMap = _.cloneDeep(map)
 
     // Move east movers
     for (var y = 0; y < h; y++) {
@@ -37,14 +33,13 @@ const solve1 = ({ data }) => {
         const n = _.get(map, [y, nx])
         if (n !== 0) continue
 
-        _.set(eastMovedMap, [y, x], 0)
-        _.set(eastMovedMap, [y, nx], 1)
+        _.set(nextMap, [y, x], 0)
+        _.set(nextMap, [y, nx], 1)
         moved += 1
       }
     }
 
-    var map = _.cloneDeep(eastMovedMap)
-    var southMovedMap = _.cloneDeep(map)
+    var map = _.cloneDeep(nextMap)
 
     // Move south movers
     for (var y = 0; y < h; y++) {
@@ -57,13 +52,13 @@ const solve1 = ({ data }) => {
         const n = _.get(map, [ny, x])
         if (n !== 0) continue
 
-        _.set(southMovedMap, [y, x], 0)
-        _.set(southMovedMap, [ny, x], 2)
+        _.set(nextMap, [y, x], 0)
+        _.set(nextMap, [ny, x], 2)
         moved += 1
       }
     }
 
-    map = _.cloneDeep(southMovedMap)
+    map = _.cloneDeep(nextMap)
 
     steps += 1
     done = moved === 0
