@@ -10,7 +10,7 @@ const solve1 = ({ data }) => {
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-console.log("Task:", [{ data: data }].map(solve1))
+// console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
