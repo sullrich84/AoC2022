@@ -39,9 +39,9 @@ const solve1 = ({ data }) => {
     for (var b = 0; b < beacons.length; b++) {
       const [cx, cy, cz] = beacons[b]
 
-      for (var bn = 0; bn < beacons.length; bn++) {
-        if (b === bn) continue
-        const [nx, ny, nz] = beacons[bn]
+      for (var nb = 0; nb < beacons.length; nb++) {
+        if (b === nb) continue
+        const [nx, ny, nz] = beacons[nb]
         const rotations = rotate([nx, ny, nz])
 
         // Rotate point to all posible rotations
@@ -52,7 +52,7 @@ const solve1 = ({ data }) => {
           const [xDist, yDist, zDist] = [Math.abs(cx - rx), Math.abs(cy - ry), Math.abs(cz - rz)]
           const key = [xDist, yDist, zDist].sort((a, b) => b - a).join("-")
 
-          _.set(hashes, [`s${s}`, `r${r}`, bn], key)
+          _.set(hashes, [`s${s}`, `r${r}`, nb], key)
         }
       }
     }
