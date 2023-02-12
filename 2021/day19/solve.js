@@ -36,6 +36,7 @@ const solve1 = ({ data }) => {
 
   for (var s = 0; s < data.length; s++) {
     const beacons = data[s]
+
     for (var b = 0; b < beacons.length; b++) {
       const [cx, cy, cz] = beacons[b]
 
