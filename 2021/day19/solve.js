@@ -7,51 +7,52 @@ console.log("🎄 Day 19: Beacon Scanner")
 
 const solve1 = ({ data }) => {
   const hashes = {}
-  const rotate = ([x, y, z]) => [
-    [x, y, z],
-    [x, z, -y],
-    [x, -y, -z],
-    [x, -z, y],
-    [-x, -y, z],
-    [-x, z, y],
-    [-x, y, -z],
-    [-x, -z, -y],
-    [y, z, x],
-    [y, x, -z],
-    [y, -z, -x],
-    [y, -x, z],
-    [-y, -z, x],
-    [-y, x, z],
-    [-y, z, -x],
-    [-y, -x, -z],
-    [z, x, y],
-    [z, y, -x],
-    [z, -x, -y],
-    [z, -y, x],
-    [-z, -x, y],
-    [-z, y, x],
-    [-z, x, -y],
-    [-z, -y, -x],
+  const rotate = [
+    ([x, y, z]) => [x, y, z],
+    ([x, y, z]) => [x, z, -y],
+    ([x, y, z]) => [x, -y, -z],
+    ([x, y, z]) => [x, -z, y],
+    ([x, y, z]) => [-x, -y, z],
+    ([x, y, z]) => [-x, z, y],
+    ([x, y, z]) => [-x, y, -z],
+    ([x, y, z]) => [-x, -z, -y],
+    ([x, y, z]) => [y, z, x],
+    ([x, y, z]) => [y, x, -z],
+    ([x, y, z]) => [y, -z, -x],
+    ([x, y, z]) => [y, -x, z],
+    ([x, y, z]) => [-y, -z, x],
+    ([x, y, z]) => [-y, x, z],
+    ([x, y, z]) => [-y, z, -x],
+    ([x, y, z]) => [-y, -x, -z],
+    ([x, y, z]) => [z, x, y],
+    ([x, y, z]) => [z, y, -x],
+    ([x, y, z]) => [z, -x, -y],
+    ([x, y, z]) => [z, -y, x],
+    ([x, y, z]) => [-z, -x, y],
+    ([x, y, z]) => [-z, y, x],
+    ([x, y, z]) => [-z, x, -y],
+    ([x, y, z]) => [-z, -y, -x],
   ]
 
-  for (var s = 0; s < data.length; s++) {
-    const beacons = data[s]
+  for (var r = 0; r < rotate.length; r++) {
+    for (var s = 0; s < data.length; s++) {
+      const beacons = data[s]
 
-    for (var b = 0; b < beacons.length; b++) {
-      const [cx, cy, cz] = beacons[b]
+      for (var b = 0; b < beacons.length; b++) {
+        // Static reference point
+        const [ax, ay, az] = beacons[b]
 
-      for (var nb = 0; nb < beacons.length; nb++) {
-        if (b === nb) continue
-        const [nx, ny, nz] = beacons[nb]
-        const rotations = rotate([nx, ny, nz])
+        // Calculate distance between A and B and use it as some sort of hash
+        for (var nb = 0; nb < beacons.length; nb++) {
+          // Skip self comparison
+          if (b === nb) continue
 
-        // Rotate point to all posible rotations
-        for (var r = 0; r < rotations.length; r++) {
-          const [rx, ry, rz] = rotations[r]
+          const [bx, by, bz] = beacons[nb]
+          const [rax, ray, raz] = rotate[r]([ax, ay, az])
+          const [rbx, rby, rbz] = rotate[r]([bx, by, bz])
 
-          // Calculate distances between beacons to use them as some sort of hash
-          const [xDist, yDist, zDist] = [Math.abs(cx - rx), Math.abs(cy - ry), Math.abs(cz - rz)]
-          const key = [xDist, yDist, zDist].sort((a, b) => b - a).join("-")
+          const [xd, yd, zd] = [Math.abs(rax - rbx), Math.abs(ray - rby), Math.abs(raz - rbz)]
+          const key = [xd, yd, zd].join("-")
 
           _.set(hashes, [`s${s}`, `r${r}`, nb], key)
         }
@@ -70,6 +71,7 @@ const solve1 = ({ data }) => {
         }
       }
     }
+    ent
   }
 
   return 0
