@@ -34,51 +34,34 @@ const solve1 = ({ data }) => {
     ([x, y, z]) => [-z, -y, -x],
   ]
 
+  const buildPairs = (arr) => _.flatMap(arr, (a, ai) => _.map(arr.slice(ai + 1), (b, bi) => [a, b, ai, bi]))
+
+  // Compute distances between each beacon of every scanner for all possible rotations
   for (var r = 0; r < rotate.length; r++) {
     for (var s = 0; s < data.length; s++) {
-      const beacons = data[s]
+      const pairs = buildPairs(data[s])
+      const sHashes = pairs
+        .map(([[ax, ay, az], [bx, by, bz], ai, bi]) => [[ax - bx, ay - by, az - bz], `s${s}:b${ai}`, `s${s}:b${bi}`])
+        .map(([[dx, dy, dz], ai, bi]) => [rotate[r]([dx, dy, dz]), ai, bi])
+        .map(([[dx, dy, dz], ai, bi]) => [[Math.abs(dx), Math.abs(dy), Math.abs(dz)], ai, bi])
+        .map(([[dx, dy, dz], ai, bi]) => [[dx, dy, dz].join("-"), ai, bi])
 
-      for (var b = 0; b < beacons.length; b++) {
-        // Static reference point
-        const [ax, ay, az] = beacons[b]
-
-        // Calculate distance between A and B and use it as some sort of hash
-        for (var nb = 0; nb < beacons.length; nb++) {
-          // Skip self comparison
-          if (b === nb) continue
-
-          const [bx, by, bz] = beacons[nb]
-          const [rax, ray, raz] = rotate[r]([ax, ay, az])
-          const [rbx, rby, rbz] = rotate[r]([bx, by, bz])
-
-          const [xd, yd, zd] = [Math.abs(rax - rbx), Math.abs(ray - rby), Math.abs(raz - rbz)]
-          const key = [xd, yd, zd].join("-")
-
-          _.set(hashes, [`s${s}`, `r${r}`, nb], key)
-        }
-      }
+      _.set(hashes, [`s${s}`, `r${r}`], sHashes)
     }
   }
 
-  for (const [name, rotations] of _.entries(hashes)) {
-    for (const [id, rotation] of _.entries(rotations)) {
-      const next = _.omit(hashes, [name])
+  // Create list of ids and assume they are uniqe
+  const scanners = data.length
+  const beacons = data[0].length
+  const uniqueBeacons = _.flatten(_.times(scanners, (s) => _.times(beacons, (b) => `s${s}b${b}`)))
 
-      for (const [nName, nRotations] of _.entries(next)) {
-        for (const [nId, nRotation] of _.entries(nRotations)) {
-          const common = _.intersection(rotation, nRotation)
-          console.log(`${name}.${id} ∩ ${nName}.${nId}`, common.length)
-        }
-      }
-    }
-    ent
-  }
+
 
   return 0
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-// console.log("Task:", [{ data: data }].map(solve1))
+console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
