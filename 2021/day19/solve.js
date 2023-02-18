@@ -53,11 +53,30 @@ const solve1 = ({ data }) => {
   // Create list of ids and assume they are uniqe
   const scanners = data.length
   const beacons = data[0].length
-  const uniqueBeacons = _.flatten(_.times(scanners, (s) => _.times(beacons, (b) => `s${s}b${b}`)))
 
+  const uniqueBeacons = new Set(_.flatten(_.times(scanners, (s) => _.times(beacons, (b) => `s${s}b${b}`))))
+  // const duplicateBeacons = new Set()
 
+  _.mapValues(hashes, (a, an) => {
+    _.mapValues(hashes, (b, bn) => {
+      if (an === bn) return
+      const aHashes = a.r0.map(([hash]) => hash)
 
-  return 0
+      const overlapping =
+        _.values(b).find((bRx) => {
+          const bHashes = bRx.map(([hash]) => hash)
+          return _.intersection(aHashes, bHashes)
+        }) || []
+
+      if (overlapping.length >= 66) {
+        console.log(`Scanner ${an} and ${bn} have overlapping detection regions`)
+      } else {
+        console.log(`Scanner ${an} and ${bn} have no overlapping detection regions`)
+      }
+    })
+  })
+
+  return uniqueBeacons.size
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
