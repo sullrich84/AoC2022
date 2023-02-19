@@ -54,22 +54,25 @@ const solve1 = ({ data }) => {
   const scanners = data.length
   const beacons = data[0].length
 
-  const uniqueBeacons = new Set(_.flatten(_.times(scanners, (s) => _.times(beacons, (b) => `s${s}b${b}`))))
-  // const duplicateBeacons = new Set()
+  const uniqueBeacons = []
+  const duplicateBeacons = []
 
   _.mapValues(hashes, (a, an) => {
     _.mapValues(hashes, (b, bn) => {
       if (an === bn) return
       const aHashes = a.r0.map(([hash]) => hash)
 
-      const overlapping =
-        _.values(b).find((bRx) => {
-          const bHashes = bRx.map(([hash]) => hash)
-          return _.intersection(aHashes, bHashes)
-        }) || []
+      const [rotation, intersection] = _.toPairs(b).find(([bRn, bRx]) => {
+        const bHashes = bRx.map(([hash]) => hash)
+        const intersection = _.intersection(aHashes, bHashes)
+        return intersection.length > 0 ? [bRn, intersection] : undefined
+      }) || [undefined, undefined]
 
-      if (overlapping.length >= 66) {
-        console.log(`Scanner ${an} and ${bn} have overlapping detection regions`)
+      if (intersection && intersection.length >= 66) {
+        const duplicates = _.uniq(_.flatten(intersection.map(([_hash, ai, bi]) => [ai, bi])))
+
+        
+        console.log(`Scanner ${an} and ${bn}:${rotation} have overlapping detection regions`)
       } else {
         console.log(`Scanner ${an} and ${bn} have no overlapping detection regions`)
       }
