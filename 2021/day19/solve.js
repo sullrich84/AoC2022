@@ -75,8 +75,8 @@ const solve1 = ({ data }) => {
       }) || [undefined, undefined]
 
       if (intersection && intersection.length >= 66) {
-        lastRotation = rotation
         const bHashes = intersection.map(([hash]) => hash)
+        lastRotation = rotation
         uniqueBeacons = _.uniq(_.flatten([uniqueBeacons, aHashes, bHashes]))
 
         console.log(`Scanner ${an} and ${bn}:${rotation} have overlapping detection regions`)
