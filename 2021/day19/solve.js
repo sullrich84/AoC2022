@@ -36,6 +36,12 @@ const solve1 = ({ data }) => {
 
   const buildPairs = (arr) => _.flatMap(arr, (a, ai) => _.map(arr.slice(ai + 1), (b, bi) => [a, b, ai, bi]))
 
+  const x = ["x", "y", "z", "d"]
+  const a = ["b", "b", "c", "d"]
+
+  const d = _.difference(x, a)
+  const i = _.intersection(x, a)
+
   // Compute distances between each beacon of every scanner for all possible rotations
   for (var r = 0; r < rotate.length; r++) {
     for (var s = 0; s < data.length; s++) {
@@ -54,13 +60,13 @@ const solve1 = ({ data }) => {
   const scanners = data.length
   const beacons = data[0].length
 
-  const uniqueBeacons = []
-  const duplicateBeacons = []
+  var uniqueBeacons = []
+  var lastRotation = "r0"
 
   _.mapValues(hashes, (a, an) => {
     _.mapValues(hashes, (b, bn) => {
       if (an === bn) return
-      const aHashes = a.r0.map(([hash]) => hash)
+      const aHashes = a[lastRotation].map(([hash]) => hash)
 
       const [rotation, intersection] = _.toPairs(b).find(([bRn, bRx]) => {
         const bHashes = bRx.map(([hash]) => hash)
@@ -69,21 +75,20 @@ const solve1 = ({ data }) => {
       }) || [undefined, undefined]
 
       if (intersection && intersection.length >= 66) {
-        const duplicates = _.uniq(_.flatten(intersection.map(([_hash, ai, bi]) => [ai, bi])))
+        lastRotation = rotation
+        const bHashes = intersection.map(([hash]) => hash)
+        uniqueBeacons = _.uniq(_.flatten([uniqueBeacons, aHashes, bHashes]))
 
-        
         console.log(`Scanner ${an} and ${bn}:${rotation} have overlapping detection regions`)
-      } else {
-        console.log(`Scanner ${an} and ${bn} have no overlapping detection regions`)
       }
     })
   })
 
-  return uniqueBeacons.size
+  return uniqueBeacons.length / 2
 }
 
 console.log("Sample:", [{ data: sample }].map(solve1))
-console.log("Task:", [{ data: data }].map(solve1))
+// console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
 
