@@ -21,7 +21,6 @@ const solve1 = ({ data }) => {
   return _.sum(_.flatten(matrix).map((e) => (e > 1 ? 1 : 0)))
 }
 
-console.log("Sample:", [{ data: sample }].map(solve1))
 console.log("Task:", [{ data: data }].map(solve1))
 
 /// Part 2
